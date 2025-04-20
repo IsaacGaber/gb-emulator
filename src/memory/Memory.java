@@ -6,13 +6,17 @@ public class Memory {
     private static final int ADDRESS_SPACE = 65536;
     private static enum area {BIOS, ROM0, ROM1, VRAM, ERAM, WRAM0, WRAM1, ECHO, OAM, IO, HRAM, IE, IF, NONE};
 
-    private byte[] _ram = new byte[ADDRESS_SPACE];
-    private byte[] _bios = new byte[256];
-    private area _at = area.NONE;
+    private static byte[] _ram = new byte[ADDRESS_SPACE];
+    private static byte[] _bios = new byte[256];
+    private static area _at = area.NONE;
 
-    public boolean inBios = true;
+    private static boolean inBios = true;
+    
+    Memory() {
+        loadBIOS();
+    }
 
-    public void loadBIOS(){
+    public void loadBIOS() {
         // load boot rom into memory
         try {
             File f = new File("src\\dmg_boot.bin");
@@ -27,7 +31,7 @@ public class Memory {
     }
 
     // shadow WRAM not emulated
-    public int getByte(int addr) {
+    public static int getByte(int addr) {
         switch (addr & 0xF000) { // mask out lower bits
             // 256 byte BIOS / start of 16 KiB ROM 0
             case 0x0000:
@@ -104,15 +108,15 @@ public class Memory {
         }
     }
 
-    public void setByte(int addr, int b){
+    public static void setByte(int addr, int b) {
         _ram[addr] = (byte) b;
     }
 
-    public int getWord(int addr) {
+    public static int getWord(int addr) {
         return (getByte(addr) << 8 | getByte(addr+1));
     }
 
-    public String lastArea(){
+    public static String lastArea() {
         return _at.name();
     }
 

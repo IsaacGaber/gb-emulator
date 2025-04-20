@@ -1,17 +1,11 @@
 package cpu.instruction;
 
-import cpu.CPU;
-
-// import java.util.Collections;
-// import java.util.function.Consumer;
-// import java.util.*;
-// import cpu.Flag;
 
 public class Instruction {
     private final String _mnemonic;
     // private final Operand _lOperand;
     // private final Operand _rOperand;
-    private final Operand[] _operands;
+    private final Operands _operands;
     private final int _bytes;
     // private final int _flags;
     private final int _cycles;
@@ -33,7 +27,7 @@ public class Instruction {
         _op = op;
     }
 
-    Instruction(String mnemonic, int bytes, boolean immediate, int cycles, Operand[] operands, Op op){
+    Instruction(String mnemonic, int bytes, boolean immediate, int cycles, Operands operands, Op op){
         _mnemonic = mnemonic;
         _bytes = bytes;
         _immediate = immediate;

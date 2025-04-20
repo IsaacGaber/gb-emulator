@@ -28,4 +28,18 @@ public class DoubleRegister implements Register {
     public int get() {
         return _a.get() << 8 | _b.get();
     }
+
+    @Override
+    public void inc() {
+        int d = get();
+        d++;
+        set(d);
+    }
+
+    @Override
+    public void dec() {
+        int d = get();
+        d--;
+        set(d);
+    }
 }

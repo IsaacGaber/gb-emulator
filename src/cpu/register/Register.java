@@ -6,4 +6,9 @@ public interface Register {
 
     public int get();
 
+    // only used by some registers
+    public void inc(); // increment
+
+    public void dec(); // decrement
+    
 }

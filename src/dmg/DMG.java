@@ -5,7 +5,7 @@ public class DMG {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello, World!");
-        System.out.println(BitUtil.is8Bit(0xFFFF));
+        System.out.println(BitUtil.is8Bit(0xFF));
     }
 
 }

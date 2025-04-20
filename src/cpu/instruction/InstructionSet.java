@@ -1,7 +1,6 @@
 package cpu.instruction;
 
 import cpu.CPU;
-import cpu.register.Register;
 
 public class InstructionSet {
     private Instruction[] _UNPREFIXED;
@@ -9,10 +8,12 @@ public class InstructionSet {
 
     public InstructionSet() {
 
-        _UNPREFIXED[0x00] = new Instruction(null, 1, false, 0, 
-                                            (Op)(o)->{});
+        _UNPREFIXED[0x00] = new Instruction("NOP", 1, false, 4, 
+                                            (Op)(o) -> {});
 
-        _UNPREFIXED[0x01] = new Instruction("LD", 3, false, 0, {new Operand(OperandType.BC), new Operand(OperandType.N16)}, null)
+        _UNPREFIXED[0x01] = new Instruction("LD", 3, true, 12, 
+                                            new Operands(Operand.R16, Operand.N16), 
+                                            (Op)(o) -> {CPU.setReg("BC", CPU.nextByte());});
 
     }
     
