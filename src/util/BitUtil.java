@@ -2,8 +2,8 @@ package util;
 
 public class BitUtil {
 
-    public static final int MASK_8 = 0xFFFFFF00;
-    public static final int MASK_16 = 0xFFFF0000;
+    public static final int MASK_8  = 0x000000FF;
+    public static final int MASK_16 = 0x0000FFFF;
     
     public static boolean is8Bit(int i) {
         return (i & MASK_8) == 0;

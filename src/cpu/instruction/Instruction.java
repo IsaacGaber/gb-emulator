@@ -48,7 +48,14 @@ public class Instruction {
     }
 
     public String toString() {
-        return  _mnemonic;
+        String str = _mnemonic;
+        if (_operands.left() != null) {
+            str += " " + _operands.left();
+            if (_operands.right() != null) {
+                str += ", " + _operands.right();
+            }
+        } 
+        return str;
     }
     
     // public Operand getLOperand() {

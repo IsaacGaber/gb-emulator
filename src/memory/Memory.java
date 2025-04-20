@@ -19,7 +19,7 @@ public class Memory {
     public void loadBIOS() {
         // load boot rom into memory
         try {
-            File f = new File("src\\dmg_boot.bin");
+            File f = new File("src\\bin\\test.gb");
             FileInputStream input = new FileInputStream(f);
             for (int i = 0; i < _bios.length; i++) {
                 _bios[i] = (byte) input.read();

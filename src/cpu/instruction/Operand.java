@@ -77,4 +77,8 @@ public enum Operand {
     //         throw new RuntimeException("Invalid Operand Type: " + s);
     //     }
     // }
+
+    // public String toString(){
+    //     return this.name();
+    // }
 }

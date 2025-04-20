@@ -9,12 +9,14 @@ public class DMG {
         // CPU must be initialized with reference to memory -- imagine conduits connecting
         CPU cpu = new CPU(memory);
 
-        while (true) {
+        for (int i = 0; i < 3; i++) {
             cpu.step();
-            break;
+
         }
+        // while (true) {
+        // }
         
-        System.out.println("Hello, World!");
+        // System.out.println("Hello, World!");
     }
 
 }

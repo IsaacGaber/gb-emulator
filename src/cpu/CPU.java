@@ -2,6 +2,7 @@ package cpu;
 
 import java.util.*;
 import memory.*;
+import util.BitUtil;
 import util.Util;
 import cpu.instruction.Instruction;
 import cpu.instruction.InstructionSet;
@@ -15,8 +16,7 @@ public class CPU {
 
     private InstructionSet _instructionSet;
     private Memory _memory;
-    private int _currentByte;
-    
+
     public CPU(Memory memory) {
         _memory = memory;
         _instructionSet = new InstructionSet(this, _memory);
@@ -54,11 +54,24 @@ public class CPU {
         } else {
             instruction = _instructionSet.getUnprefixed(curr);
         }
-        System.out.println(instruction);
-        System.out.println(this);
+        // try {        
+        System.out.println(Util.byteToHexstring(curr));
 
+        System.out.println(instruction);
+
+        instruction.run();
+        // } catch (Exception e) {
+        //     throw new RuntimeException("invalid/unimplemented instruction: " + Util.byteToHexstring(curr));
+        // }
+        System.out.println(this);
     }
 
+    // returns reference to register if valid
+    public Register reg(String reg) {
+        return _registers.get(reg);
+    }
+
+    // sets specified register to value
     public void setReg(String reg, int val) {
         _registers.get(reg).set(val);
     }
@@ -71,11 +84,23 @@ public class CPU {
         F.set(f);
     }
 
+    public void clearFlag(Flag f) {
+        F.set(BitUtil.setBit(F.get(), f.POS, false));
+    }
+
+    public boolean flagSet(Flag f) {
+        return (F.get() & f.VALUE) != 0;
+    }
+
     // fetches next byte and incremements program counter
     public int nextByte() {
         int i = _memory.getByte(PC.get());
         PC.inc();
         return i;
+    }
+
+    public int nextWord() {
+        return (nextByte() << 8) | nextByte();
     }
 
     public String toString() {
