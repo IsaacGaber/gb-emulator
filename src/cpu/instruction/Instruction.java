@@ -1,22 +1,13 @@
 package cpu.instruction;
 
-
 public class Instruction {
+    
     private final String _mnemonic;
-    // private final Operand _lOperand;
-    // private final Operand _rOperand;
     private final Operands _operands;
     private final int _bytes;
-    // private final int _flags;
     private final int _cycles;
     private final boolean _immediate;
-
     private final Op _op;
-
-    // private final char[] _flags = new char[4];
-
-    // build instruction set -- used to get binary representation
-    // public static final InstructionSet instructionSet = InstructionBuilder.buildInstructions();
 
     Instruction(String mnemonic, int bytes, boolean immediate, int cycles, Op op) {
         _mnemonic = mnemonic;

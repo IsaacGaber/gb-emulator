@@ -8,7 +8,7 @@ public class FlagRegister extends ByteRegister {
         _b |= f.VALUE;
     }
 
-    public boolean isSet(Flag f) {
+    public boolean flagSet(Flag f) {
         return (_b & f.VALUE) != 0;
     }
 
