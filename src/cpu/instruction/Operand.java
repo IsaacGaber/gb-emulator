@@ -82,14 +82,14 @@ public class Operand {
     //     _data = d;
     // }
 
-    public boolean isData(){
-        return (OPERAND_TYPE != null 
-                && (OPERAND_TYPE == OperandType.N8 
-                || OPERAND_TYPE == OperandType.N16 
-                || OPERAND_TYPE == OperandType.A8 
-                || OPERAND_TYPE == OperandType.A16 
-                || OPERAND_TYPE == OperandType.E8));
-    }
+    // public boolean isData(){
+    //     return (OPERAND_TYPE != null 
+    //             && (OPERAND_TYPE == OperandType.N8 
+    //             || OPERAND_TYPE == OperandType.N16 
+    //             || OPERAND_TYPE == OperandType.A8 
+    //             || OPERAND_TYPE == OperandType.A16 
+    //             || OPERAND_TYPE == OperandType.E8));
+    // }
 
     // private boolean parenthesisBalanced(String s){
     //     int cnt = 0;
