@@ -5,7 +5,7 @@ public class ByteRegister implements Register {
 
     @Override
     public void set(int i) {
-        _b = (byte) i;
+        _b = i & 0xFF;
     }
 
     @Override

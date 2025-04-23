@@ -9,6 +9,17 @@ public class Instruction {
     private final boolean _immediate;
     private final Op _op;
 
+    @SuppressWarnings("unused")
+    private Instruction() {
+        _mnemonic = null;
+        _bytes = 0;
+        _immediate = false;
+        _cycles = 0;
+        _operands = null;
+        _op = null;
+
+    };
+
     Instruction(String mnemonic, int bytes, boolean immediate, int cycles, Op op) {
         _mnemonic = mnemonic;
         _bytes = bytes;
@@ -43,8 +54,9 @@ public class Instruction {
         }
     }
 
-    public void run() {
+    public int run() {
         _op.accept(_operands);
+        return this._bytes;
     }
 
     public String toString() {

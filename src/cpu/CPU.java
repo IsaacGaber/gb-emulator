@@ -17,6 +17,9 @@ public class CPU {
     private InstructionSet _instructionSet;
     private Memory _memory;
 
+    // cpu cycles
+    private int _cycles; 
+
     public CPU(Memory memory) {
         _memory = memory;
         _instructionSet = new InstructionSet(this, _memory);
@@ -55,11 +58,10 @@ public class CPU {
             instruction = _instructionSet.getUnprefixed(curr);
         }
         // try {        
-        System.out.println(Util.byteToHexstring(curr));
+        System.out.println("Next byte: " + Util.byteToHexstring(curr));
+        System.out.println("Instruction: " + instruction);
 
-        System.out.println(instruction);
-
-        instruction.run();
+        _cycles += instruction.run();
         // } catch (Exception e) {
         //     throw new RuntimeException("invalid/unimplemented instruction: " + Util.byteToHexstring(curr));
         // }
@@ -89,7 +91,7 @@ public class CPU {
     }
 
     public boolean flagSet(Flag f) {
-        return (F.get() & f.VALUE) != 0;
+        return (F.get() & (1 << f.POS)) != 0;
     }
 
     // fetches next byte and incremements program counter
@@ -105,16 +107,18 @@ public class CPU {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        StringBuilder sbTwo = new StringBuilder();
+        sb.append("Registers:\n");
+
         for (Map.Entry<String, Register> entry : _registers.entrySet()) {
-            sb.append(entry.getKey() + ": ");
             Register reg = entry.getValue();
+            
             if (reg instanceof DoubleRegister) {
-                sb.append(Util.wordToHexstring(entry.getValue().get()));
+                sbTwo.append(String.format("%s: %10.5s\n", entry.getKey(), Util.wordToHexstring(entry.getValue().get())));
             } else if (reg instanceof ByteRegister) {
-                sb.append(String.format("%6.6s",Util.byteToHexstring(entry.getValue().get())));
+                sb.append(String.format("%s: %11.3s\n", entry.getKey(), Util.byteToHexstring(entry.getValue().get())));
             }
-            sb.append('\n');
         }
-        return sb.toString();
+        return sb.toString() + sbTwo.toString();
     }
 }

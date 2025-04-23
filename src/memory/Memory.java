@@ -10,24 +10,42 @@ public class Memory {
     private byte[] _bios = new byte[256];
     private Area _at = Area.NONE;
 
-    private boolean inBios = true;
+    private boolean inBios;
     
-    public Memory() {
-        loadBIOS();
+    public Memory(String romPath) {
+        // loadBIOS();
+        loadROM(romPath);
     }
 
+    // can run 
     public void loadBIOS() {
         // load boot rom into memory
         try {
-            File f = new File("src\\bin\\test.gb");
+            File f = new File("assets\\test.gb");
             FileInputStream input = new FileInputStream(f);
             for (int i = 0; i < _bios.length; i++) {
-                _bios[i] = (byte) input.read();
+                setByte(i, input.read());
             }
+            inBios = true;
             input.close();
         } catch (Exception e) {
             System.err.println("Could not load BIOS file.");
         }
+    }
+
+    public void loadROM(String romPath){
+        try {
+            File f = new File(romPath);
+            FileInputStream input = new FileInputStream(f);
+            // reads 32KiB into the ROM banks
+            for (int i = 0; i < 0x8000; i++) {
+                setByte(i, input.read());
+            }
+            input.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not load ROM file"); 
+        }
+
     }
 
     // shadow WRAM not emulated

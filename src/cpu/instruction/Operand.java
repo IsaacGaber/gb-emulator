@@ -9,6 +9,8 @@ public enum Operand {
     E8,  // 8-bit signed offset (-128 to 127).
     U3, // 3-bit unsigned bit index (0 to 7, with 0 as the least significant bit).
     CC; // conditional codes
+
+
     // // 8 bit registers
     // A,
     // B,
