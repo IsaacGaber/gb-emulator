@@ -27,7 +27,7 @@ public class ByteRegister implements Register {
     public void dec() {
         _b--;
         if (_b < 0) {
-            _b = 0xFF;
+            _b = 0;
         }
 
     }

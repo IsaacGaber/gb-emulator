@@ -4,17 +4,17 @@ public class Instruction {
     
     private final String _mnemonic;
     private final Operands _operands;
-    private final int _bytes;
-    private final int _cycles;
+    public final int BYTES;
+    public final int CYCLES;
     // private final boolean _immediate;
     private final Op _op;
 
     @SuppressWarnings("unused")
     private Instruction() {
         _mnemonic = null;
-        _bytes = 0;
+        BYTES = 0;
         // _immediate = false;
-        _cycles = 0;
+        CYCLES = 0;
         _operands = null;
         _op = null;
 
@@ -22,18 +22,18 @@ public class Instruction {
 
     Instruction(String mnemonic, int bytes, int cycles, Op op) {
         _mnemonic = mnemonic;
-        _bytes = bytes;
+        BYTES = bytes;
         // _immediate = immediate;
-        _cycles = cycles;
+        CYCLES = cycles;
         _operands = null;
         _op = op;
     }
 
     Instruction(String mnemonic, int bytes, int cycles, Operands operands, Op op){
         _mnemonic = mnemonic;
-        _bytes = bytes;
+        BYTES = bytes;
         // _immediate = immediate;
-        _cycles = cycles;
+        CYCLES = cycles;
         _operands = operands;
         _op = op;
     }
@@ -54,9 +54,8 @@ public class Instruction {
         }
     }
 
-    public int run() {
+    public void run() {
         _op.accept(_operands);
-        return this._bytes;
     }
 
     public String toString() {

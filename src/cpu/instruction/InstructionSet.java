@@ -12,7 +12,7 @@ public class InstructionSet {
 
 
     // used for simplifying construction of similar instructions                                
-    private static final String[] regIter = new String[]{"B", "C", "D", "E", "H", "L", "A", "_HL"}; // F not included as F never directly addressed
+    private static final String[] regIter = new String[]{"B", "C", "D", "E", "H", "L", "_HL", "A"}; // F not included as F never directly addressed
     private static final String[] doubleRegIter = new String[]{"BC", "DE", "HL", "SP"};              // PC never operand? -- TODO confirm
 
     public InstructionSet(CPU cpu, Memory memory) {
@@ -20,6 +20,7 @@ public class InstructionSet {
         _CBPREFIXED = new Instruction[256];
 
         // DISREGARD HALF CARRY FLAGS
+        // access memory through cpu.nextByte/Word() when memory is part of instruction, otherwise, use memory.getByte/Word() and increment PC manually
 
         _UNPREFIXED[0x00] = new Instruction("NOP", 1, 4, 
                                             (Op)o -> {});
@@ -85,19 +86,26 @@ public class InstructionSet {
         // all r8-r8 add operations, indices 0x80-0x87
         for (int i = 0; i < 8; i++) {
             Register A = cpu.reg("A");
-            Register X = cpu.reg(regIter[i]);
+            String rightRegister = regIter[i];
             _UNPREFIXED[0x80+i] = new Instruction("ADD", 1, 4, 
                                                     new Operands(Operand.R8, Operand.R8),
                                                     (Op) o -> {    
-                                                                    int x = A.get();
-                                                                    int y = X.get();
-                                                                    int result = x + y;
+                                                                    Register X = cpu.reg(rightRegister);
+                                                                    int a = A.get();
+                                                                    int x;
+                                                                    // case indirect operands 
+                                                                    if (rightRegister.equals("_HL")) {
+                                                                        x = memory.getByte(X.get());
+                                                                    } else {
+                                                                        x = X.get();
+                                                                    }
+                                                                    int result = a + x;
                                                                     A.set(result);
                                                                     // set flags
-                                                                    if (BitUtil.bitCarried(x, y, 8)) {
+                                                                    if (BitUtil.bitCarried(x, a, 8)) {
                                                                         cpu.setFlag(Flag.C);
                                                                     }
-                                                                    if (BitUtil.bitCarried(x, y, 4)) {
+                                                                    if (BitUtil.bitCarried(x, a, 4)) {
                                                                         cpu.setFlag(Flag.H);
                                                                     }
                                                                     if (result == 0) {
@@ -106,6 +114,7 @@ public class InstructionSet {
                                                                     cpu.clearFlag(Flag.N);
                                                                 });
         }      
+
         // add with n8                       
         _UNPREFIXED[0xC6] = new Instruction("ADD", 2, 8,
                                             new Operands(Operand.R8, Operand.N8),
@@ -132,9 +141,13 @@ public class InstructionSet {
         _UNPREFIXED[0xC2] = new Instruction("JP", 3, 16, // can also be 12 cycles
                                             new Operands(Operand.CC, Operand.N16),
                                             (Op) o -> {    
+                                                            Register PC = cpu.reg("PC");
                                                             if (!cpu.flagSet(Flag.Z)) {
-                                                                Register PC = cpu.reg("PC");
-                                                                PC.set(cpu.nextWord());           
+                                                                System.out.println("PC pre word" + PC.get());
+                                                                PC.set(cpu.nextWord());      
+                                                                System.out.println("PC post word" + PC.get());
+                                                            } else {
+                                                                PC.set(PC.get() + 2);
                                                             }
                                                             
                                                         });

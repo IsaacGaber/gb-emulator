@@ -14,8 +14,6 @@ public class CPU {
     private final DoubleRegister AF, BC, DE, HL, PC, SP;
     private final TreeMap<String, Register> _registers;
 
-    private final IndirectRegister _HL, _HLi, _HLd;
-
     private InstructionSet _instructionSet;
     private Memory _memory;
 
@@ -44,10 +42,6 @@ public class CPU {
         // program counter and stack pointer
         PC = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("PC", PC);
         SP = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("SP", SP);
-        // indirect double registers -- INCOMPLETE
-        _HL = new IndirectRegister(HL, 0, memory);              _registers.put("_HL", HL);
-        _HLd = new IndirectRegister(HL, -1, memory);
-        _HLi = new IndirectRegister(HL, 1, memory);
 
 
         // init program counter
@@ -68,10 +62,12 @@ public class CPU {
             instruction = _instructionSet.getUnprefixed(curr);
         }
         // try {        
-        System.out.println("Next byte: " + Util.byteToHexstring(curr));
+        System.out.println("Byte Value: " + Util.byteToHexstring(curr));
         System.out.println("Instruction: " + instruction);
 
-        _cycles += instruction.run();
+        instruction.run();
+        _cycles += instruction.CYCLES;
+        // PC.set(PC.get() + instruction.BYTES);
         // } catch (Exception e) {
         //     throw new RuntimeException("invalid/unimplemented instruction: " + Util.byteToHexstring(curr));
         // }
@@ -111,8 +107,12 @@ public class CPU {
         return i;
     }
 
+    // confirm this is actually how the memory is stored 
     public int nextWord() {
-        return (nextByte() << 8) | nextByte();
+        int i = _memory.getWord(PC.get());
+        PC.inc();
+        PC.inc();
+        return (i);
     }
 
     public String toString() {

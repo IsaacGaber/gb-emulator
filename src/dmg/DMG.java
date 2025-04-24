@@ -29,7 +29,7 @@ public class DMG {
         while (answer) {
             cpu.step();
             System.out.print("Continue stepping CPU? (Y/N): ");
-            answer = in.nextLine().toLowerCase().equals("y");
+            answer = in.nextLine().toLowerCase().equals("y");    
         }
         System.out.println("Exiting");
     }
