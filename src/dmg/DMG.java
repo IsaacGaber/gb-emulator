@@ -41,7 +41,7 @@ public class DMG {
                 cpu.step();
             }
         }
-        
+        in.close();
         System.out.println("Exiting");
     }
 

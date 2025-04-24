@@ -10,14 +10,7 @@ public class Instruction {
     private Op _op;
 
     @SuppressWarnings("unused")
-    private Instruction() {
-        // _mnemonic = null;
-        // _bytes = 0;
-        // _cycles = 0;
-        // _operands = null;
-        // _op = null;
-
-    };
+    private Instruction() {};
 
     // some instructions have no operands
     Instruction(String mnemonic, int bytes, int cycles, Op op) {
