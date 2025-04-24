@@ -2,10 +2,8 @@ package cpu;
 
 import java.util.*;
 import memory.*;
-import util.BitUtil;
-import util.Util;
-import cpu.instruction.Instruction;
-import cpu.instruction.InstructionSet;
+import util.*;
+import cpu.instruction.*;
 import cpu.register.*;
 
 public class CPU {
@@ -16,6 +14,12 @@ public class CPU {
 
     private InstructionSet _instructionSet;
     private Memory _memory;
+
+    public enum States {
+        HALTED, RUNNING
+    }
+
+    private States _state;
 
     // cpu cycles
     private int _cycles; 
@@ -50,6 +54,7 @@ public class CPU {
 
         _instructionSet = new InstructionSet(this, _memory);
 
+        _state = States.RUNNING;
     }
 
     public void step() {
@@ -65,12 +70,7 @@ public class CPU {
         System.out.println("Byte Value: " + Util.byteToHexstring(curr));
         System.out.println("Instruction: " + instruction);
 
-        instruction.run();
-        _cycles += instruction.CYCLES;
-        // PC.set(PC.get() + instruction.BYTES);
-        // } catch (Exception e) {
-        //     throw new RuntimeException("invalid/unimplemented instruction: " + Util.byteToHexstring(curr));
-        // }
+        _cycles += instruction.run();
         System.out.println(this);
     }
 
@@ -115,10 +115,19 @@ public class CPU {
         return (i);
     }
 
+    public void halt() {
+        _state = States.HALTED;
+    }
+
+    public boolean running() {
+        return _state == States.RUNNING;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         StringBuilder sbTwo = new StringBuilder();
-        sb.append("Registers:\n");
+        sb.append("Machine Cycles: " + _cycles);
+        sb.append("\nRegisters:\n");
 
         for (Map.Entry<String, Register> entry : _registers.entrySet()) {
             Register reg = entry.getValue();

@@ -25,12 +25,23 @@ public class DMG {
         Memory memory = new Memory(romPath);
         // CPU must be initialized with reference to memory -- imagine conduits connecting elements
         CPU cpu = new CPU(memory);
-        boolean answer = true;
-        while (answer) {
-            cpu.step();
-            System.out.print("Continue stepping CPU? (Y/N): ");
-            answer = in.nextLine().toLowerCase().equals("y");    
+
+        // handle different run modes
+        System.out.println("Would you like to step through the ROM or run until Halted?\nType (S) for Step Mode and (R) for Run Mode");
+        String input = in.nextLine().toLowerCase();
+        if (input.equals("s")) {
+            boolean answer = true;
+            while (answer && cpu.running()) {
+                cpu.step();
+                System.out.print("Continue stepping CPU? (Y/N): ");
+                answer = in.nextLine().toLowerCase().equals("y");    
+            }
+        } else if(input.equals("r")) {
+            while (cpu.running()) {
+                cpu.step();
+            }
         }
+        
         System.out.println("Exiting");
     }
 

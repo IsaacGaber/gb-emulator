@@ -2,38 +2,33 @@ package cpu.instruction;
 
 public class Instruction {
     
-    private final String _mnemonic;
-    private final Operands _operands;
-    public final int BYTES;
-    public final int CYCLES;
+    private String _mnemonic;
+    private Operands _operands;
+    private int _bytes;
+    private int _cycles;
     // private final boolean _immediate;
-    private final Op _op;
+    private Op _op;
 
     @SuppressWarnings("unused")
     private Instruction() {
-        _mnemonic = null;
-        BYTES = 0;
-        // _immediate = false;
-        CYCLES = 0;
-        _operands = null;
-        _op = null;
+        // _mnemonic = null;
+        // _bytes = 0;
+        // _cycles = 0;
+        // _operands = null;
+        // _op = null;
 
     };
 
+    // some instructions have no operands
     Instruction(String mnemonic, int bytes, int cycles, Op op) {
-        _mnemonic = mnemonic;
-        BYTES = bytes;
-        // _immediate = immediate;
-        CYCLES = cycles;
-        _operands = null;
-        _op = op;
+        this(mnemonic, bytes, cycles, null, op);
     }
 
     Instruction(String mnemonic, int bytes, int cycles, Operands operands, Op op){
         _mnemonic = mnemonic;
-        BYTES = bytes;
+        _bytes = bytes;
         // _immediate = immediate;
-        CYCLES = cycles;
+        _cycles = cycles;
         _operands = operands;
         _op = op;
     }
@@ -54,8 +49,13 @@ public class Instruction {
         }
     }
 
-    public void run() {
+    /** performs Op on Operands
+     * 
+     * @return number of machine cycles taken
+     */
+    public int run() {
         _op.accept(_operands);
+        return _cycles;
     }
 
     public String toString() {

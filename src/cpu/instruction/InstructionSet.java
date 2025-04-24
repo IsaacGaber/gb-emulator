@@ -15,7 +15,10 @@ public class InstructionSet {
     private static final String[] regIter = new String[]{"B", "C", "D", "E", "H", "L", "_HL", "A"}; // F not included as F never directly addressed
     private static final String[] doubleRegIter = new String[]{"BC", "DE", "HL", "SP"};              // PC never operand? -- TODO confirm
 
+
     public InstructionSet(CPU cpu, Memory memory) {
+        // final Register[] regs = new Register[]{cpu.reg("B"), cpu.reg("C"), cpu.reg(null)};
+
         _UNPREFIXED = new Instruction[256];
         _CBPREFIXED = new Instruction[256];
 
@@ -143,9 +146,7 @@ public class InstructionSet {
                                             (Op) o -> {    
                                                             Register PC = cpu.reg("PC");
                                                             if (!cpu.flagSet(Flag.Z)) {
-                                                                System.out.println("PC pre word" + PC.get());
                                                                 PC.set(cpu.nextWord());      
-                                                                System.out.println("PC post word" + PC.get());
                                                             } else {
                                                                 PC.set(PC.get() + 2);
                                                             }
@@ -160,7 +161,7 @@ public class InstructionSet {
                                                         });
                                                         
         // wait until interrupt
-        _UNPREFIXED[0x76] = new Instruction("HALT", 1, 4, null);
+        _UNPREFIXED[0x76] = new Instruction("HALT", 1, 4, (Op) o -> {cpu.halt();});
         
         System.out.println(this);
     }
@@ -177,7 +178,7 @@ public class InstructionSet {
 
         StringBuilder sb = new StringBuilder();
         Instruction[] instructions  = _UNPREFIXED;
-        sb.append("IMPLEMENTED INSTRUCTIONS\n\n");
+        sb.append("CURRENTLY IMPLEMENTED INSTRUCTIONS\n\n");
         sb.append("UNPREFIXED:\n");
         for (int i = 0; i < 2; i++) {
             sb.append("      ");
