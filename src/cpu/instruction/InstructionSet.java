@@ -11,13 +11,10 @@ public class InstructionSet {
     private Instruction[] _CBPREFIXED;
 
 
-    // used for simplifying construction of similar instructions                                
-    private static final String[] regIter = new String[]{"B", "C", "D", "E", "H", "L", "_HL", "A"}; // F not included as F never directly addressed
-    private static final String[] doubleRegIter = new String[]{"BC", "DE", "HL", "SP"};              // PC never operand? -- TODO confirm
-
 
     public InstructionSet(CPU cpu, Memory memory) {
-        // final Register[] regs = new Register[]{cpu.reg("B"), cpu.reg("C"), cpu.reg(null)};
+        // used for simplifying construction of similar instructions                                
+        final Register[] r8 = new Register[]{cpu.B, cpu.C, cpu.D, cpu.E, cpu.H, cpu.L, cpu._HL, cpu.A}; // specifically used for arithmetic
 
         _UNPREFIXED = new Instruction[256];
         _CBPREFIXED = new Instruction[256];
@@ -34,14 +31,12 @@ public class InstructionSet {
         _UNPREFIXED[0x04] = new Instruction("INC", 1, 4, 
                                             new Operands(Operand.R8, null),
                                             (Op)o -> {    
-                                                            Register B = cpu.reg("B");
-
                                                             // overflow and flags
-                                                            if (B.get() + 1 > 255) {
-                                                                B.set(0);
+                                                            if (cpu.B.get() + 1 > 255) {
+                                                                cpu.B.set(0);
                                                                 cpu.setFlag(Flag.Z);
                                                             } else {
-                                                                B.inc();
+                                                                cpu.B.inc();
                                                             }
                                                             cpu.clearFlag(Flag.N);
                                                         });
@@ -50,58 +45,47 @@ public class InstructionSet {
         _UNPREFIXED[0x05] = new Instruction("DEC", 1, 4, 
                                             new Operands(Operand.R8, null), 
                                             (Op) o -> {
-                                                Register B = cpu.reg("B");
-
                                                 // overflow and flags
-                                                if (B.get()-1 == 0) {
+                                                if (cpu.B.get()-1 == 0) {
                                                     cpu.setFlag(Flag.Z);
-                                                } else if (B.get()-1 < 0) {
-                                                    B.set(255);
+                                                } else if (cpu.B.get()-1 < 0) {
+                                                    cpu.B.set(255);
                                                 } 
-                                                B.dec();
+                                                cpu.B.dec();
                                                 cpu.setFlag(Flag.C);
                                             });
 
         // load register B to 8-bit value
         _UNPREFIXED[0x06] = new Instruction("LD", 2, 8, 
                                             new Operands(Operand.R8, Operand.N8), 
-                                            (Op) o -> {cpu.setReg("B", cpu.nextByte());});
+                                            (Op) o -> {cpu.B.set(cpu.nextByte());});
 
         // all 8-bit register to register loads, indices 0x40-0x7F
-        // for (int i = 0x40; i < 0x80; i++) {
-        //     String leftStr = regIter[(i >> 3) - 8];
-        //     String rightStr = regIter[i % 8]; 
-        //     _UNPREFIXED[i] = new Instruction(null, 1, false, 4, 
-        //                                     new Operands(Operand.R8, Operand.R8), 
-        //                                     (Op) o -> {
-        //                                         Register left, right;
-        //                                         if (leftStr.equals("[HL]")) {
-                                                    
-        //                                         } else if (rightStr.equals("[HL]")) {
-
-        //                                         } else {
-        //                                             left = cpu.reg(leftStr);
-        //                                             right = cpu.reg(rightStr);
-        //                                         }
-        //                                     });
-        // }
+        for (int y = 0; y < r8.length; y++){
+            Register left = r8[y];
+            for (int x = 0; x < r8.length; x++) {
+                Register right = r8[x];
+                // if either left or right register is [HL] then instruction takes 8 cycles instead of 4
+                _UNPREFIXED[0x40 + (y*r8.length + x)] = new Instruction("LD", 1, (left == cpu._HL|| right == cpu._HL) ? 8 : 4, 
+                                                                new Operands(Operand.R8, Operand.R8), 
+                                                                (Op) o -> {
+                                                                    // load left register with right register value
+                                                                    left.set(right.get());
+                                                                });
+            }
+        }
 
         // all r8-r8 add operations, indices 0x80-0x87
         for (int i = 0; i < 8; i++) {
-            Register A = cpu.reg("A");
-            String rightRegister = regIter[i];
+            // result always stored in register A
+            Register A = cpu.A;
+            Register X = r8[i];
             _UNPREFIXED[0x80+i] = new Instruction("ADD", 1, 4, 
                                                     new Operands(Operand.R8, Operand.R8),
                                                     (Op) o -> {    
-                                                                    Register X = cpu.reg(rightRegister);
                                                                     int a = A.get();
-                                                                    int x;
-                                                                    // case indirect operands 
-                                                                    if (rightRegister.equals("_HL")) {
-                                                                        x = memory.getByte(X.get());
-                                                                    } else {
-                                                                        x = X.get();
-                                                                    }
+                                                                    int x = X.get();
+
                                                                     int result = a + x;
                                                                     A.set(result);
                                                                     // set flags
@@ -122,11 +106,10 @@ public class InstructionSet {
         _UNPREFIXED[0xC6] = new Instruction("ADD", 2, 8,
                                             new Operands(Operand.R8, Operand.N8),
                                             (Op) o -> {
-                                                Register A = cpu.reg("A");
-                                                int x = A.get();
+                                                int x = cpu.A.get();
                                                 int y = cpu.nextByte();
                                                 int result = x + y;
-                                                A.set(result);
+                                                cpu.A.set(result);
                                                 // set flags
                                                 if (BitUtil.bitCarried(x, y, 8)) {
                                                     cpu.setFlag(Flag.C);
@@ -144,20 +127,17 @@ public class InstructionSet {
         _UNPREFIXED[0xC2] = new Instruction("JP", 3, 16, // can also be 12 cycles
                                             new Operands(Operand.CC, Operand.N16),
                                             (Op) o -> {    
-                                                            Register PC = cpu.reg("PC");
                                                             if (!cpu.flagSet(Flag.Z)) {
-                                                                PC.set(cpu.nextWord());      
+                                                                cpu.PC.set(cpu.nextWord());      
                                                             } else {
-                                                                PC.set(PC.get() + 2);
+                                                                cpu.PC.set(cpu.PC.get() + 2);
                                                             }
-                                                            
                                                         });
         // unconditional jump
         _UNPREFIXED[0xC3] = new Instruction("JP", 3, 16, 
                                             new Operands(Operand.N16, null),
                                             (Op) o -> {    
-                                                            Register PC = cpu.reg("PC");
-                                                            PC.set(cpu.nextWord());                                                                       
+                                                            cpu.PC.set(cpu.nextWord());                                                                       
                                                         });
                                                         
         // wait until interrupt

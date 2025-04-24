@@ -1,16 +1,22 @@
 package cpu;
 
 import java.util.*;
+import java.util.Map.Entry;
+
 import memory.*;
 import util.*;
 import cpu.instruction.*;
 import cpu.register.*;
 
 public class CPU {
-    private final ByteRegister A, B, C, D, E, H, L;
-    private final FlagRegister F;
-    private final DoubleRegister AF, BC, DE, HL, PC, SP;
-    private final TreeMap<String, Register> _registers;
+    public final ByteRegister A, B, C, D, E, H, L;
+    public final FlagRegister F;
+    public final DoubleRegister AF, BC, DE, HL, PC, SP;
+    // _HLi and _HLd are increment and decrement versions of indirect HL respectively
+    public final IndirectRegister _BC, _DE, _HL, _HLi, _HLd;
+    public final TreeMap<String, Register> _registers;
+
+    // private final TreeSet<Register> _registers; 
 
     private InstructionSet _instructionSet;
     private Memory _memory;
@@ -26,8 +32,9 @@ public class CPU {
 
     public CPU(Memory memory) {
         _memory = memory;
-
+        // init register array - used only for toString
         _registers = new TreeMap<>();
+
         // init _registers
         A = new ByteRegister(); _registers.put("A", A);
         B = new ByteRegister(); _registers.put("B", B);
@@ -46,7 +53,12 @@ public class CPU {
         // program counter and stack pointer
         PC = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("PC", PC);
         SP = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("SP", SP);
-
+        // indirect registers
+        _BC = new IndirectRegister(BC, 0, memory);
+        _DE = new IndirectRegister(DE, 0, memory);
+        _HL = new IndirectRegister(HL, 0, memory);
+        _HLi = new IndirectRegister(HL, 1, memory);
+        _HLd = new IndirectRegister(HL, -1, memory);
 
         // init program counter
         PC.set(0);
@@ -75,18 +87,18 @@ public class CPU {
     }
 
     // returns reference to register if valid
-    public Register reg(String reg) {
-        return _registers.get(reg);
-    }
+    // public Register reg(String reg) {
+    //     return _registers.get(reg);
+    // }
 
     // sets specified register to value
-    public void setReg(String reg, int val) {
-        _registers.get(reg).set(val);
-    }
+    // public void setReg(String reg, int val) {
+    //     _registers.get(reg).set(val);
+    // }
 
-    public int getReg(String reg) {
-        return _registers.get(reg).get();
-    }
+    // public int getReg(String reg) {
+    //     return _registers.get(reg).get();
+    // }
 
     public void setFlag(Flag f) {
         F.set(f);
@@ -129,13 +141,13 @@ public class CPU {
         sb.append("Machine Cycles: " + _cycles);
         sb.append("\nRegisters:\n");
 
-        for (Map.Entry<String, Register> entry : _registers.entrySet()) {
+        for (Entry<String, Register> entry : _registers.entrySet()) {
+            String name = entry.getKey();
             Register reg = entry.getValue();
-            
             if (reg instanceof DoubleRegister) {
-                sbTwo.append(String.format("%s: %10.5s\n", entry.getKey(), Util.wordToHexstring(entry.getValue().get())));
+                sbTwo.append(String.format("%s: %10.5s\n", name, Util.wordToHexstring(reg.get())));
             } else if (reg instanceof ByteRegister) {
-                sb.append(String.format("%s: %11.3s\n", entry.getKey(), Util.byteToHexstring(entry.getValue().get())));
+                sb.append(String.format("%s: %11.3s\n", name, Util.byteToHexstring(reg.get())));
             }
         }
         return sb.toString() + sbTwo.toString();
