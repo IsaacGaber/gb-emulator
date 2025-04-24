@@ -1,5 +1,6 @@
 package cpu.register;
 
+// Integer bounds checked, overflow simulated
 public class ByteRegister implements Register {
     protected int _b;
 
@@ -17,10 +18,17 @@ public class ByteRegister implements Register {
     @Override
     public void inc() {
         _b++;
+        if (_b > 0xFF) {
+            _b = 0;
+        }
     }
 
     @Override
     public void dec() {
         _b--;
+        if (_b < 0) {
+            _b = 0xFF;
+        }
+
     }
 }

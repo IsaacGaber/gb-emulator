@@ -6,33 +6,33 @@ public class Instruction {
     private final Operands _operands;
     private final int _bytes;
     private final int _cycles;
-    private final boolean _immediate;
+    // private final boolean _immediate;
     private final Op _op;
 
     @SuppressWarnings("unused")
     private Instruction() {
         _mnemonic = null;
         _bytes = 0;
-        _immediate = false;
+        // _immediate = false;
         _cycles = 0;
         _operands = null;
         _op = null;
 
     };
 
-    Instruction(String mnemonic, int bytes, boolean immediate, int cycles, Op op) {
+    Instruction(String mnemonic, int bytes, int cycles, Op op) {
         _mnemonic = mnemonic;
         _bytes = bytes;
-        _immediate = immediate;
+        // _immediate = immediate;
         _cycles = cycles;
         _operands = null;
         _op = op;
     }
 
-    Instruction(String mnemonic, int bytes, boolean immediate, int cycles, Operands operands, Op op){
+    Instruction(String mnemonic, int bytes, int cycles, Operands operands, Op op){
         _mnemonic = mnemonic;
         _bytes = bytes;
-        _immediate = immediate;
+        // _immediate = immediate;
         _cycles = cycles;
         _operands = operands;
         _op = op;
@@ -61,7 +61,8 @@ public class Instruction {
 
     public String toString() {
         String str = _mnemonic;
-        if (_operands.left() != null) {
+
+        if (_operands != null && _operands.left() != null) {
             str += " " + _operands.left();
             if (_operands.right() != null) {
                 str += ", " + _operands.right();

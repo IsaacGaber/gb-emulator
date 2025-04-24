@@ -14,6 +14,8 @@ public class CPU {
     private final DoubleRegister AF, BC, DE, HL, PC, SP;
     private final TreeMap<String, Register> _registers;
 
+    private final IndirectRegister _HL, _HLi, _HLd;
+
     private InstructionSet _instructionSet;
     private Memory _memory;
 
@@ -22,7 +24,6 @@ public class CPU {
 
     public CPU(Memory memory) {
         _memory = memory;
-        _instructionSet = new InstructionSet(this, _memory);
 
         _registers = new TreeMap<>();
         // init _registers
@@ -43,9 +44,18 @@ public class CPU {
         // program counter and stack pointer
         PC = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("PC", PC);
         SP = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("SP", SP);
+        // indirect double registers -- INCOMPLETE
+        _HL = new IndirectRegister(HL, 0, memory);              _registers.put("_HL", HL);
+        _HLd = new IndirectRegister(HL, -1, memory);
+        _HLi = new IndirectRegister(HL, 1, memory);
+
+
         // init program counter
         PC.set(0);
         SP.set(0); // TODO CHANGE TO ACTUAL START VALUE FOR STACK
+
+        _instructionSet = new InstructionSet(this, _memory);
+
     }
 
     public void step() {
