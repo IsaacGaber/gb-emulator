@@ -61,7 +61,7 @@ public class CPU {
         _HLd = new IndirectRegister(HL, -1, memory);
 
         // init program counter
-        PC.set(0);
+        PC.set(0x150);
         SP.set(0); // TODO CHANGE TO ACTUAL START VALUE FOR STACK
 
         _instructionSet = new InstructionSet(this, _memory);
@@ -138,7 +138,7 @@ public class CPU {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         StringBuilder sbTwo = new StringBuilder();
-        sb.append("Machine Cycles: " + _cycles);
+        sb.append("Instruction Cycles: " + _cycles);
         sb.append("\nRegisters:\n");
 
         for (Entry<String, Register> entry : _registers.entrySet()) {

@@ -1,7 +1,6 @@
 package dmg;
-import java.io.FileInputStream;
-import java.util.Scanner;
 
+import java.util.Scanner;
 import cpu.CPU;
 import memory.Memory;
 

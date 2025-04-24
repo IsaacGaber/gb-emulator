@@ -86,7 +86,7 @@ public class InstructionSet {
 
         // n8 -> r8 loads 
         // 0x06, 0x16, 0x26, 0x36 and 0x0E, 0x1E, 0x2E, 0x3E
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < r8.length/2; i++) {
             int offset = 0x10 * i;
             Register X = r8[i * 2];
             Register Y = r8[i * 2 + 1];
