@@ -4,10 +4,12 @@ import util.BitUtil;
 
 // simplifies converting from video memory bytes to pixels
 public class Tile {
-    public byte[] bytes;
-    public final int SIZE = 8;
+    private byte[] bytes;
+    public static final int SIZE = 8;
+    public static final int BYTE_LENGTH = 16;
+
     public Tile(byte[] bytes) {
-        if (bytes.length == 16) {
+        if (bytes.length == BYTE_LENGTH) {
             this.bytes = bytes;
         } else {
             throw new RuntimeException("invalid byte length: " + bytes.length);

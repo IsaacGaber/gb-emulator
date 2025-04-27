@@ -6,9 +6,15 @@ public enum Flag {
     H (6),  // half-carry
     N (5),  // operation used subtraction
     C (4),   // carry
-    NONE (0); // no flag set
+    NC,          // not carry
+    NZ,         // not zero
+    NONE; // no flag set
 
-    public final int POS;
+    public final Integer POS;
+
+    private Flag(){
+        this(0);
+    }
 
     private Flag(int pos) {
         // this.VALUE = val;

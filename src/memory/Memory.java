@@ -2,9 +2,12 @@ package memory;
 import java.io.File;
 import java.io.FileInputStream;
 
+import video.Tile;
+
 public class Memory {
     private static final int ADDRESS_SPACE = 65536;
-    private static enum Area {BIOS, ROM0, ROM1, VRAM, ERAM, WRAM0, WRAM1, ECHO, OAM, IO, HRAM, IE, IF, NONE};
+    public static final int VRAM_SIZE = 0x2000;
+    private static enum Area { BIOS, ROM0, ROM1, VRAM, ERAM, WRAM0, WRAM1, ECHO, OAM, IO, HRAM, IE, IF, NONE};
 
     private byte[] _ram = new byte[ADDRESS_SPACE];
     private byte[] _bios = new byte[256];
@@ -15,6 +18,15 @@ public class Memory {
     public Memory(String romPath) {
         // loadBIOS();
         loadROM(romPath);
+        
+        // should load a bunch of sprites right in the middle of Vram
+        // byte[] testTile = new byte[]{0x3C, 0x7E, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 
+        //                             0x7E, 0x5E, 0x7E, 0x0A, 0x7C, 0x56, 0x38, 0x7C};
+        // for (int i = 0x8800; i < 0x9800; i++) {
+        //     _ram[i] = testTile[i % testTile.length];
+        // }
+
+
     }
 
     // can run 
@@ -63,9 +75,13 @@ public class Memory {
         _ram[addr] = (byte) b;
     }
 
-    // update location of "_at"
     public void update(int addr) {
-        _at = switch (addr & 0xF000) {
+        _at = ramArea(addr);
+    }
+    
+    // update location of "_at"
+    public Area ramArea(int addr) {
+        Area area = switch (addr & 0xF000) {
             // mask out lower bits
             // 256 byte BIOS / start of 16 KiB ROM 0
             case 0x0000:
@@ -125,6 +141,7 @@ public class Memory {
             default:
                 yield Area.NONE;
         };
+        return area;
     }
 
     public int getWord(int addr) {

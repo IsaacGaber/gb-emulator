@@ -85,21 +85,7 @@ public class CPU {
         _cycles += instruction.run();
         System.out.println(this);
     }
-
-    // returns reference to register if valid
-    // public Register reg(String reg) {
-    //     return _registers.get(reg);
-    // }
-
-    // sets specified register to value
-    // public void setReg(String reg, int val) {
-    //     _registers.get(reg).set(val);
-    // }
-
-    // public int getReg(String reg) {
-    //     return _registers.get(reg).get();
-    // }
-
+    
     public void setFlag(Flag f) {
         F.set(f);
     }

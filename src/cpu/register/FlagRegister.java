@@ -9,7 +9,11 @@ public class FlagRegister extends ByteRegister {
     }
 
     public boolean flagSet(Flag f) {
-        return (_b & (1 << f.POS)) != 0;
+        if (f == Flag.NZ || f == Flag.NC) {
+            return (_b & (1 << f.POS)) == 0;
+        } else {
+            return (_b & (1 << f.POS)) != 0;
+        }
     }
 
 }
