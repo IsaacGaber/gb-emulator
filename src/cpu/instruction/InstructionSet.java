@@ -131,16 +131,13 @@ public class InstructionSet {
                                                             new Operands(Operand.R8, Operand.R8), 
                                                             (Op) o -> {
                                                                 // load A into location in memory pointed to by left register
-                                                                // System.out.println("Setting byte at address: " + r16[i].get() + " To: " + A.get());        
-                                                                memory.setByte(X.get(), A.get());
+                                                                X.set(A.get());
                                                             }));
 
             _UNPREFIXED_MAP.put(0x0A + offset,  new Instruction("LD", 1, 8, 
                                                             new Operands(Operand.R8, Operand.R8), 
                                                             (Op) o -> {
                                                                 // load left register with val in memory pointed to by right
-                                                                // System.out.println("Setting Register A to byte at address: " + X.get() + " To: " + A.get());        
-
                                                                 A.set(memory.getByte(X.get()));
                                                             }));
         }

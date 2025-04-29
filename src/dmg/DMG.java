@@ -24,10 +24,10 @@ public class DMG {
         // }
         romPath = "assets\\hello-world.gb";
         Memory memory = new Memory(romPath);
-        // CPU must be initialized with reference to memory -- imagine conduits connecting elements
-        CPU cpu = new CPU(memory);
         // init vram display
         PPU ppu = new PPU(memory);
+        // CPU must be initialized with reference to memory -- imagine conduits connecting elements
+        CPU cpu = new CPU(memory);
 
     
         // handle different run modes

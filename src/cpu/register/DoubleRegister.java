@@ -20,8 +20,8 @@ public class DoubleRegister implements Register {
 
     @Override
     public void set(int i) {
-        _a.set((i >> 8) & BitUtil.MASK_8);
-        _b.set(i & BitUtil.MASK_8);
+        _a.set((i >> 8) & 0xFF);
+        _b.set(i & 0xFF);
     }
 
     @Override

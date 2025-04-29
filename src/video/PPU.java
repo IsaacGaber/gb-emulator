@@ -9,11 +9,10 @@ import memory.Memory;
 
 // pixel processing unit, main class of package
 public class PPU {
-
+    private Memory _memory; 
     @SuppressWarnings("unused")
     private PPU(){};
 
-    private Memory _memory; 
 
     public PPU(Memory memory) {
         _memory = memory;

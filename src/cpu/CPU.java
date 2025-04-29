@@ -9,6 +9,7 @@ import cpu.instruction.*;
 import cpu.register.*;
 
 public class CPU {
+
     public final ByteRegister A, B, C, D, E, H, L;
     public final FlagRegister F;
     public final DoubleRegister AF, BC, DE, HL, PC, SP;
@@ -17,6 +18,8 @@ public class CPU {
     public final TreeMap<String, Register> _registers;
 
     // private final TreeSet<Register> _registers; 
+    private int currentByte;
+    private Instruction currentInstruction;
 
     private InstructionSet _instructionSet;
     private Memory _memory;
@@ -70,19 +73,16 @@ public class CPU {
     }
 
     public void step() {
-        int curr = nextByte();
-        Instruction instruction;
-        if (curr == 0xCB) {
-            curr = nextByte();
-            instruction = _instructionSet.getCBPrefixed(curr);
+        currentByte = nextByte();
+        if (currentByte == 0xCB) {
+            currentByte = nextByte();
+            currentInstruction = _instructionSet.getCBPrefixed(currentByte);
         } else {
-            instruction = _instructionSet.getUnprefixed(curr);
+            currentInstruction = _instructionSet.getUnprefixed(currentByte);
         }
         // try {        
-        System.out.println("Byte Value: " + Util.byteToHexstring(curr));
-        System.out.println("Instruction: " + instruction);
 
-        _cycles += instruction.run();
+        _cycles += currentInstruction.run();
     }
     
     public void setFlag(Flag f) {
@@ -120,6 +120,9 @@ public class CPU {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         StringBuilder sbTwo = new StringBuilder();
+        sb.append("Byte Value: " + Util.byteToHexstring(currentByte));
+        sb.append("Instruction: " + currentInstruction);
+
         sb.append("Instruction Cycles: " + _cycles);
         sb.append("\nRegisters:\n");
 

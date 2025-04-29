@@ -2,6 +2,8 @@ package memory;
 import java.io.File;
 import java.io.FileInputStream;
 
+import util.Util;
+
 public class Memory {
     private static final int ADDRESS_SPACE = 65536;
     private static final int VRAM_START = 0x8000;
@@ -42,7 +44,7 @@ public class Memory {
             File f = new File("assets\\test.gb");
             FileInputStream input = new FileInputStream(f);
             for (int i = 0; i < _bios.length; i++) {
-                setByte(i, input.read());
+                _bios[i] = (byte) input.read();
             }
             inBios = true;
             input.close();
@@ -57,10 +59,11 @@ public class Memory {
             FileInputStream input = new FileInputStream(f);
             // reads 32KiB into the ROM banks
             for (int i = 0; i < 0x8000; i++) {
-                setByte(i, input.read());
+                _ram[i] = (byte) input.read();
             }
             input.close();
         } catch (Exception e) {
+            System.out.println(e);
             throw new RuntimeException("Could not load ROM file"); 
         }
 
@@ -68,26 +71,24 @@ public class Memory {
 
     // shadow WRAM not emulated
     public int getByte(int addr) {
-        update(addr);
+        _at = ramArea(addr);
         if (inBios && addr < _bios.length) {
             return Byte.toUnsignedInt(_bios[addr]);
         } else {
+            // System.out.println("Getting value: " + Util.byteToHexstring(_ram[addr]) + " at address: " +  Util.wordToHexstring(addr));
             return Byte.toUnsignedInt(_ram[addr]);
         }
     }
 
     public void setByte(int addr, int b) {
-        update(addr);
+        _at = ramArea(addr);
+        // System.out.println("setting address: " + Util.wordToHexstring(addr) + " to value: " + Util.byteToHexstring(b));
+        if (_at == Area.ROM0 || _at == Area.ROM1) {
+            throw new RuntimeException("Cannot modify ROM");
+        }
         _ram[addr] = (byte) b;
     }
 
-    public void update(int addr) {
-        _at = ramArea(addr);
-        // if (_at == Area.VRAM) {
-        //     System.out.println("ACCESSING VRAM");
-        // }
-    }
-    
     // update location of "_at"
     public Area ramArea(int addr) {
         Area area = switch (addr & 0xF000) {
