@@ -15,5 +15,4 @@ public class FlagRegister extends ByteRegister {
             return (_b & (1 << f.POS)) != 0;
         }
     }
-
 }

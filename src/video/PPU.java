@@ -1,10 +1,9 @@
 package video;
 
-import java.awt.Graphics;
-import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import memory.Memory;
 
@@ -20,23 +19,27 @@ public class PPU {
         _memory = memory;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                showDisplay(); 
+                showVramDisplay(_memory); 
             }});
+
     }
 
-    public byte getVram(int i) {
-        if (i >= 0 && i < Memory.VRAM_SIZE) {
-            return (byte) _memory.getByte(i + 0x8000);
-        } else {
-            throw new IndexOutOfBoundsException(i);
-        }
-    }
 
-    private void showDisplay() {
+    private void showVramDisplay(Memory memory) {
         JFrame f = new JFrame("VRAM tile view");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.addWindowStateListener(null);
-        Display d = new Display(this);
+        VRAMDisplay d = new VRAMDisplay();
+
+        int delay = 100; // milliseconds equivalent to 10 FPS
+        ActionListener actionListener = new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                d.updateTiles(_memory.getVramView());
+                d.repaint();
+            }
+        };
+        new Timer(delay, actionListener).start();
+
         f.add(d);
         f.pack();
         f.setResizable(false);

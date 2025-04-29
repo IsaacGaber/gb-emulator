@@ -51,8 +51,8 @@ public class CPU {
         DE = new DoubleRegister(D, E);  _registers.put("DE", DE);
         HL = new DoubleRegister(H, L);  _registers.put("HL", HL);
         // program counter and stack pointer
-        PC = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("PC", PC);
         SP = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("SP", SP);
+        PC = new DoubleRegister(new ByteRegister(), new ByteRegister());    _registers.put("PC", PC);
         // indirect registers
         _BC = new IndirectRegister(BC, 0, memory);
         _DE = new IndirectRegister(DE, 0, memory);
@@ -83,19 +83,18 @@ public class CPU {
         System.out.println("Instruction: " + instruction);
 
         _cycles += instruction.run();
-        System.out.println(this);
     }
     
     public void setFlag(Flag f) {
         F.set(f);
     }
 
-    public void clearFlag(Flag f) {
-        F.set(BitUtil.setBit(F.get(), f.POS, false));
+    public void incCycles(int cycles){
+        _cycles += cycles;
     }
 
-    public boolean flagSet(Flag f) {
-        return (F.get() & (1 << f.POS)) != 0;
+    public void clearFlag(Flag f) {
+        F.set(BitUtil.setBit(F.get(), f.POS, false));
     }
 
     // fetches next byte and incremements program counter
@@ -107,10 +106,7 @@ public class CPU {
 
     // confirm this is actually how the memory is stored 
     public int nextWord() {
-        int i = _memory.getWord(PC.get());
-        PC.inc();
-        PC.inc();
-        return (i);
+        return nextByte() | (nextByte() << 8);
     }
 
     public void halt() {
@@ -136,6 +132,13 @@ public class CPU {
                 sb.append(String.format("%s: %11.3s\n", name, Util.byteToHexstring(reg.get())));
             }
         }
+
+        sbTwo.append("\nFlags:\n");
+        Flag[] flags = new Flag[]{Flag.Z, Flag.N, Flag.H, Flag.C};
+        for (Flag flag : flags) {
+            sbTwo.append(String.format("\tFlag %s is%sset.\n", flag.name(), F.flagSet(flag) ? " " : " not "));
+        }
+
         return sb.toString() + sbTwo.toString();
     }
 }

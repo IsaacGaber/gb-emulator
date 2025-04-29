@@ -2,21 +2,27 @@ package memory;
 import java.io.File;
 import java.io.FileInputStream;
 
-import video.Tile;
-
 public class Memory {
     private static final int ADDRESS_SPACE = 65536;
-    public static final int VRAM_SIZE = 0x2000;
+    private static final int VRAM_START = 0x8000;
+    private static final int VRAM_END = 0xA000;
     private static enum Area { BIOS, ROM0, ROM1, VRAM, ERAM, WRAM0, WRAM1, ECHO, OAM, IO, HRAM, IE, IF, NONE};
 
-    private byte[] _ram = new byte[ADDRESS_SPACE];
-    private byte[] _bios = new byte[256];
-    private Area _at = Area.NONE;
+    private byte[] _ram;
+    private byte[] _bios;
+    private Area _at;
 
     private boolean inBios;
     
     public Memory(String romPath) {
         // loadBIOS();
+        _ram = new byte[ADDRESS_SPACE];
+        _bios = new byte[256];
+        _at = Area.NONE;
+
+        // set VBLANK to true for debugging purposes
+        _ram[0xFF44] = (byte)0x90;
+
         loadROM(romPath);
         
         // should load a bunch of sprites right in the middle of Vram
@@ -77,6 +83,9 @@ public class Memory {
 
     public void update(int addr) {
         _at = ramArea(addr);
+        // if (_at == Area.VRAM) {
+        //     System.out.println("ACCESSING VRAM");
+        // }
     }
     
     // update location of "_at"
@@ -154,5 +163,22 @@ public class Memory {
 
     public String toString() {
         return lastArea();
+    }
+
+    public byte getVram(int i) {
+        Area a = ramArea(i);
+        if (a == Area.VRAM) {
+            return _ram[i];
+        } else {
+            throw new IndexOutOfBoundsException("Index: " + i + " not in VRAM");
+        }
+    }
+
+    public byte[] getVramView() {
+        byte[] view = new byte[VRAM_END - VRAM_START];
+        for (int i = VRAM_START; i < VRAM_END; i++) {
+            view[i - VRAM_START] = _ram[i];
+        }
+        return view;
     }
 }

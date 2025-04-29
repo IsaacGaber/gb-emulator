@@ -1,6 +1,6 @@
 package video;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import memory.Memory;
 
@@ -11,32 +11,34 @@ import java.awt.image.*;
 import java.util.ArrayList;
 
 
-public class Display extends JPanel {
+public class VRAMDisplay extends JPanel {
     private ArrayList<Tile> _tiles;
-    private PPU _ppu;
-    BufferedImage _framebuffer; 
+    private BufferedImage _framebuffer; 
+    // private JLabel time;
 
-    public Display(PPU ppu) {
-        _ppu = ppu; 
+    public VRAMDisplay() {
         _framebuffer = new BufferedImage(128, 256, BufferedImage.TYPE_3BYTE_BGR);
-
+        // time = new JLabel("Time is: ");
+        // this.add(time);
         // Tile testTile = new Tile(new byte[]{0x3C, 0x7E, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 
         //                                     0x7E, 0x5E, 0x7E, 0x0A, 0x7C, 0x56, 0x38, 0x7C});
 
         _tiles = new ArrayList<>();
-
+        
         // for (int i = 0; i < 256; i++) {
         //     _tiles.add(testTile);
         // }
+    
     }
 
-    public void updateTiles() {
+    public void updateTiles(byte[] VRAM) {
         _tiles.clear();
+
         // iterate through ALL OF vram
-        for (int i = 0; i < Memory.VRAM_SIZE / Tile.BYTE_LENGTH; i++) {
+        for (int i = 0; i < VRAM.length / Tile.BYTE_LENGTH; i++) {
             byte[] tileBytes = new byte[Tile.BYTE_LENGTH];
             for (int j = 0; j < Tile.BYTE_LENGTH; j++) {
-                tileBytes[j] = _ppu.getVram(i * Tile.BYTE_LENGTH + j);
+                tileBytes[j] = VRAM[i * Tile.BYTE_LENGTH + j];
             }
             Tile t = new Tile(tileBytes);
             _tiles.add(t);
@@ -48,9 +50,9 @@ public class Display extends JPanel {
     }
 
     private void drawTiles(BufferedImage target) {
-        updateTiles();
         int offX, offY;
         offX = offY = 0;
+
         for (Tile tile : _tiles) {
 
             Colors[] tileColors = tile.tileColors();
@@ -69,7 +71,9 @@ public class Display extends JPanel {
     public void paintComponent(Graphics g) {
 
         super.paintComponent(g);       
+        
         // setBackground(getBackground());
+        // updateTiles(_memory.getVramView());
         drawTiles(_framebuffer);
         ((Graphics2D)g).drawImage(_framebuffer.getScaledInstance(getWidth(), getHeight(), 0), 1, 1, null);
         // Draw Text

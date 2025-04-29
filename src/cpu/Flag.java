@@ -3,11 +3,11 @@ package cpu;
 public enum Flag {
 
     Z (7), // operation resulted in zero
-    H (6),  // half-carry
-    N (5),  // operation used subtraction
+    N (6),  // half-carry
+    H (5),  // operation used subtraction
     C (4),   // carry
-    NC,          // not carry
-    NZ,         // not zero
+    NC (4),          // not carry
+    NZ (7),         // not zero
     NONE; // no flag set
 
     public final Integer POS;

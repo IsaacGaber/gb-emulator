@@ -2,12 +2,8 @@ package dmg;
 
 import java.util.Scanner;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
 import cpu.CPU;
 import memory.Memory;
-import video.Display;
 import video.PPU;
 
 public class DMG {
@@ -41,8 +37,16 @@ public class DMG {
             boolean answer = true;
             while (answer && cpu.running()) {
                 cpu.step();
-                System.out.print("Continue stepping CPU? (Y/N): ");
-                answer = in.nextLine().toLowerCase().equals("y");    
+                System.out.println(cpu);
+                System.out.print("Continue stepping CPU? (Y/N/R(run for 10 cycles)): ");
+                input = in.nextLine().toLowerCase();
+                if (input.equals("r")) {
+                    for (int i = 0; i < 10; i++) {
+                        cpu.step();
+                    }
+                } else {
+                    answer = input.equals("y");    
+                }
             }
         } else if(input.equals("r")) {
             while (cpu.running()) {

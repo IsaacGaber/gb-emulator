@@ -17,17 +17,30 @@ public class BitUtil {
         return ((value >> position) & 1) != 0;
     }
 
-    /** returns 
+    /** 
      * 
      * @param x operand one
      * @param y operand two
-     * @param bitPos bit to be compared e.g. bit 8 to check 8-bit arithmetic carry
-     * @return
+     * @param bitPos bit to be compared e.g. bit 8 to check 8-bit arithmetic add carry
+     * @return whether bit carried
      */
     public static boolean bitCarried(int x, int y, int bitPos) {
         int mask = (1 << bitPos);
         return (((x & (mask - 1)) + (y & (mask - 1))) & mask) == mask;
     }
+
+
+    // /** 
+    //  * 
+    //  * @param x operand one
+    //  * @param y operand two
+    //  * @param bitPos bit to be compared e.g. bit 0 to check 8-bit arithmetic sub carry
+    //  * @return whether bit carried
+    //  */
+    // public static boolean bitCarriedSub(int x, int y, int bitPos) {
+    //     int mask = (1 << (bitPos + 1));
+    //     return (((x << 1) - (y << 1)) & mask) == mask;
+    // }
 
     /** sets bit value to true or false and returns result
      * 
