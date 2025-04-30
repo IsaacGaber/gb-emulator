@@ -64,26 +64,53 @@ public class CPU {
         _HLd = new IndirectRegister(HL, -1, memory);
 
         // init program counter
-        PC.set(0x150);
-        SP.set(0); // start value set by boot ROM
+        PC.set(0);
+        SP.set(0); // start of stack set by boot ROM
 
         _instructionSet = new InstructionSet(this, _memory);
 
         _state = States.RUNNING;
     }
 
+    int furthestReached = 0;
+    Instruction furthestInstruction;
     public void step() {
+        // skip cartridge DRM check and audio -- jump straight to ROM entrypoint
+        if (PC.get() == 0x008F) {
+            PC.set(0x100);
+        }
+        // SKIP ZEROING OUT VRAM LOOP
+        // if (PC.get() == 0x000A) {
+        //     PC.set(0x000C);
+        // }
+
+        // if (PC.get() == 0x002E) {
+        //     System.out.println(graphicsCalls);
+        //     throw new RuntimeException("Finished Graphics Routine");
+        // }
+        // loop VRAM
+        // if (PC.get() == 0x00A1) {
+        //     PC.set(0x0098);
+        // }
+
         currentByte = nextByte();
+
         if (currentByte == 0xCB) {
             currentByte = nextByte();
-            System.out.println("Fetching Prefixed Instruction");
+            // System.out.println("Fetching Prefixed Instruction");
             currentInstruction = _instructionSet.getCBPrefixed(currentByte);
         } else {
             currentInstruction = _instructionSet.getUnprefixed(currentByte);
         }
 
-        System.err.println(Util.byteToHexstring(currentByte));
-        System.out.println(this);
+        // System.out.println(Util.byteToHexstring(furthestReached) +  " + "  + furthestInstruction);
+
+        // if (PC.get() < 0x95 && PC.get() > furthestReached) {
+        //     furthestReached = PC.get();
+        //     furthestInstruction = currentInstruction;
+        // }
+
+        // System.err.println(Util.byteToHexstring(currentByte));
         _cycles += currentInstruction.run();
     }
     
@@ -106,7 +133,7 @@ public class CPU {
         return i;
     }
 
-    // confirm this is actually how the memory is stored 
+    // confirm this is actually how the values are stored 
     public int nextWord() {
         return nextByte() | (nextByte() << 8);
     }
@@ -115,7 +142,7 @@ public class CPU {
         _state = States.HALTED;
     }
 
-    // TODO implement
+    // TODO implement interrupts
     public void interrupt(){
 
     }

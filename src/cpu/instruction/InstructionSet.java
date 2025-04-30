@@ -56,8 +56,8 @@ public class InstructionSet {
                             (Op) o -> {
                                 int val = cpu.SP.get();
                                 int addr = cpu.nextWord();
-                                memory.setByte(addr, val >> 8); // set lower byte
-                                memory.setByte(addr + 1, val);      // set upper byte
+                                memory.setByte(addr, val >> 8); 
+                                memory.setByte(addr + 1, val); 
                             }));
 
 
@@ -68,11 +68,13 @@ public class InstructionSet {
             _UNPREFIXED_MAP.put(0x20 + offset, new Instruction("JR", 2, 12, 
                                 new Operands(Operand.CC, Operand.E8), 
                                 (Op) o -> {
-                                    int jumpOffset = cpu.nextByte();
+                                    byte jumpOffset = (byte) cpu.nextByte();
                                     if (cpu.F.flagSet(f)) {
-                                        cpu.PC.set(cpu.PC.get() + (byte) jumpOffset);
+                                        // System.out.println("performing relative jump to:  " + jumpOffset + " because " + f.name() + " is true");
+                                        cpu.PC.set(cpu.PC.get() + jumpOffset);
                                         cpu.incCycles(4);
-                                    }
+                                        // throw new RuntimeException("conditional jump performed");
+                                    } 
                                 }));
 
         }
@@ -92,7 +94,12 @@ public class InstructionSet {
             _UNPREFIXED_MAP.put(0x01 + offset, new Instruction("LD", 3, 12, 
                                                             new Operands(Operand.R16, Operand.N16), 
                                                             (Op) o -> {
-                                                                X.set(cpu.nextWord());
+                                                                int w = cpu.nextWord();
+                                                                X.set(w);
+                                                                // if (w == 0xd8) {
+                                                                //     System.out.println(cpu);
+                                                                //     throw new RuntimeException("loading register DE with copyright tiles");    
+                                                                // }
                                                                 // System.out.println("loading 16-bit register to n8");
                                                                 }));
         }
@@ -131,7 +138,7 @@ public class InstructionSet {
         for (int i = 0; i < r8.length; i++) {
         Register X = r8[i];
         int offset = 8 * i;
-        _UNPREFIXED_MAP.put(0x05 + offset, new Instruction("dec", 1, 4 + (indirectPenalty(X, null) *  2), 
+        _UNPREFIXED_MAP.put(0x05 + offset, new Instruction("DEC", 1, 4 + (indirectPenalty(X, null) *  2), 
                                                         new Operands(Operand.R8, null), 
                                                         (Op) o -> {
                                                             X.dec();
@@ -140,6 +147,7 @@ public class InstructionSet {
                                                             } else {
                                                                 cpu.clearFlag(Flag.Z);
                                                             }
+
                                                             // half carry not set
                                                             // subtraction always set
                                                             cpu.setFlag(Flag.N);
@@ -208,12 +216,19 @@ public class InstructionSet {
             int offset = 0x10 * i;
             Register X = r8[i * 2];
             Register Y = r8[i * 2 + 1];
-            _UNPREFIXED_MAP.put(0x06 + offset, new Instruction("LD", 2, 8, 
+            _UNPREFIXED_MAP.put(0x06 + offset, new Instruction("LD", 2, 8 + indirectPenalty(X, X), 
                                                         new Operands(Operand.R8, Operand.N8), 
                                                         (Op) o -> {X.set(cpu.nextByte());}));
             _UNPREFIXED_MAP.put(0x0E + offset, new Instruction("LD", 2, 8, 
                                                         new Operands(Operand.R8, Operand.N8), 
-                                                        (Op) o -> {Y.set(cpu.nextByte());}));
+                                                        (Op) o -> {
+
+                                                            // int b = n;
+                                                            // if (Y ==cpu.H) {
+                                                            //     System.out.println("loading register H to " + Util.byteToHexstring(b));
+                                                            // }
+
+                                                            Y.set(cpu.nextByte());}));
 
         }
 
@@ -284,7 +299,7 @@ public class InstructionSet {
                                                                     int a = A.get();
                                                                     int x = X.get();
 
-                                                                    int result = a - x;
+                                                                    int result = Util.unsignedSub(a, x);
                                                                     A.set(result);
                                                                     // set flags
                                                                     if (x > a) {
@@ -422,7 +437,7 @@ public class InstructionSet {
                                                         int a = A.get();
                                                         int x = right.get();
 
-                                                        int result = a - x;
+                                                        int result = Util.unsignedSub(a, x);
                                                         result = result < 0 ? 0 : result;
                                                         // set flags
                                                         if (x > a) {
@@ -437,7 +452,7 @@ public class InstructionSet {
                                                             cpu.clearFlag(Flag.H);
                                                         }
 
-                                                        if (result == 0) {
+                                                        if (x - a == 0) {
                                                             cpu.setFlag(Flag.Z);
                                                         } else {
                                                             cpu.clearFlag(Flag.Z);
@@ -453,8 +468,9 @@ public class InstructionSet {
                                             int a = cpu.A.get();
                                             int x = cpu.nextByte();
 
-                                            int result = a - x;
-                                            result = result < 0 ? 0 : result;
+                                            // int result = Util.unsignedSub(a, x);
+                                            // System.out.println("subtracting " + Util.byteToHexstring(x) + " from " + Util.byteToHexstring(a));
+                                            // System.out.println("result is: " + result);
                                             // set flags
                                             if (x > a) {
                                                 cpu.setFlag(Flag.C);
@@ -468,7 +484,7 @@ public class InstructionSet {
                                                 cpu.clearFlag(Flag.H);
                                             }
 
-                                            if (result == 0) {
+                                            if (x - a == 0) {
                                                 cpu.setFlag(Flag.Z);
                                             } else {
                                                 cpu.clearFlag(Flag.Z);
@@ -483,6 +499,8 @@ public class InstructionSet {
                                         cpu.PC.set(memory.getWord(cpu.SP.get()));
                                         cpu.SP.inc();
                                         cpu.SP.inc();
+                                        // System.out.println("Value at Stack: " + Util.wordToHexstring(r));
+                                        // throw new RuntimeException("returning from subroutine");
                                     }));
 
         
@@ -545,13 +563,14 @@ public class InstructionSet {
             int offset = i * 8;
             _UNPREFIXED_MAP.put(0xC4 + offset, new Instruction("CALL", 3, 12, 
                                                                 new Operands(Operand.CC, Operand.A16),
-                                                                (Op) o -> {     // push next instruction onto stack, move stack
+                                                                (Op) o -> {     // push next instruction location onto stack, move stack
                                                                                 if (cpu.F.flagSet(f)) {
+                                                                                    int callAddr = cpu.nextWord(); // also increments PC to next instruction
                                                                                     cpu.SP.dec();
                                                                                     memory.setByte(cpu.SP.get(), cpu.PC.get() >> 8); // set lower byte
                                                                                     cpu.SP.dec();
-                                                                                    memory.setByte(cpu.SP.get(), cpu.PC.get());      // set upper byte
-                                                                                    cpu.PC.set(cpu.nextWord());        
+                                                                                    memory.setByte(cpu.SP.get(), cpu.PC.get() & 0xFF);      // set upper byte
+                                                                                    cpu.PC.set(callAddr);        
                                                                                     cpu.incCycles(12);                                                               
                                                                                 }
                                                                             }));                  
@@ -561,12 +580,13 @@ public class InstructionSet {
         // unconditional call
         _UNPREFIXED_MAP.put(0xCD, new Instruction("CALL", 3, 24, 
                                                         new Operands(Operand.A16, null),
-                                                        (Op) o -> {     // push next instruction onto stack, move stack
+                                                        (Op) o ->  {     // push next instruction onto stack, move stack
+                                                                        int callAddr = cpu.nextWord(); // also increments PC to next instruction
                                                                         cpu.SP.dec();
                                                                         memory.setByte(cpu.SP.get(), cpu.PC.get() >> 8); // set lower byte
                                                                         cpu.SP.dec();
-                                                                        memory.setByte(cpu.SP.get(), cpu.PC.get());      // set upper byte\
-                                                                        cpu.PC.set(cpu.nextWord());                                                                       
+                                                                        memory.setByte(cpu.SP.get(), cpu.PC.get() & 0xFF);      // set upper byte
+                                                                        cpu.PC.set(callAddr);        
                                                                     }));     
         // POP operations
         for (int i = 0; i < r16_2.length; i++) {
@@ -574,10 +594,12 @@ public class InstructionSet {
             Register X = r16_2[i];
             _UNPREFIXED_MAP.put(0xC1 + offset, new Instruction("POP", 1, 12, 
                                                         new Operands(Operand.R16, null),
-                                                        (Op) o -> {     // pop next instruction off stack, increment stack pointer
-                                                                        X.set(memory.getWord(cpu.SP.get()));
+                                                        (Op) o -> {     // pop register off stack, increment stack pointer
+                                                                        int r = memory.getByte(cpu.SP.get());
                                                                         cpu.SP.inc();
+                                                                        r |= memory.getByte(cpu.SP.get()) << 8;
                                                                         cpu.SP.inc();
+                                                                        X.set(r);
                                                                     }));
         }
  
@@ -589,9 +611,9 @@ public class InstructionSet {
                                                         new Operands(Operand.R16, null),
                                                         (Op) o -> {     // push next instruction onto stack, move stack
                                                                         cpu.SP.dec();
-                                                                        memory.setByte(cpu.SP.get(), X.get() >> 8); // set lower byte
+                                                                        memory.setByte(cpu.SP.get(), X.get() >> 8);
                                                                         cpu.SP.dec();
-                                                                        memory.setByte(cpu.SP.get(), X.get());      // set upper byte\
+                                                                        memory.setByte(cpu.SP.get(), X.get() & 0xFF);     
                                                                     }));
         }
     
@@ -652,11 +674,14 @@ public class InstructionSet {
                                                                 if (cpu.F.flagSet(Flag.C)) {
                                                                     result |= 0x1;
                                                                 }
+                                                                
                                                                 if (BitUtil.getBit(result, 8)) {
                                                                     cpu.setFlag(Flag.C);
                                                                 } else {
                                                                     cpu.clearFlag(Flag.C);
                                                                 }
+                                                                // limit to 8 bits
+                                                                result &= 0xFF;
                                                                 if (result == 0) {
                                                                     cpu.setFlag(Flag.Z);
                                                                 } else {
@@ -675,7 +700,7 @@ public class InstructionSet {
             _CBPREFIXED_MAP.put(i + 0x40, new Instruction("BIT", 2, 8 + indirectPenalty(X, null),
                                                             new Operands(Operand.U3, Operand.R8), 
                                                             (Op) o -> {
-                                                                if (BitUtil.getBit(X.get(), bit)) {
+                                                                if (!BitUtil.getBit(X.get(), bit)) {
                                                                     cpu.setFlag(Flag.Z);
                                                                 } else {
                                                                     cpu.clearFlag(Flag.Z);

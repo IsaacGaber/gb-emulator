@@ -1,6 +1,7 @@
 package memory;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Random;
 
 import util.Util;
 
@@ -17,12 +18,18 @@ public class Memory {
     private boolean inBios;
     
     public Memory(String romPath) {
+        Random random = new Random();
         _ram = new byte[ADDRESS_SPACE];
+        // for (int i = 0; i < _ram.length; i++) {
+        //     _ram[i] = (byte) random.nextInt();
+        // }
         _bios = new byte[256];
         _at = Area.NONE;
 
         // set VBLANK to true for debugging purposes
         _ram[0xFF44] = (byte)0x90;
+        // 
+        _ram[0xFF42] = (byte)0x64;
 
         loadBIOS();
         loadROM(romPath);
@@ -41,7 +48,7 @@ public class Memory {
     public void loadBIOS() {
         // load boot rom into memory
         try {
-            File f = new File("assets\\dmg-boot.bin");
+            File f = new File("assets/dmg-boot.bin");
             FileInputStream input = new FileInputStream(f);
             for (int i = 0; i < _bios.length; i++) {
                 _bios[i] = (byte) input.read();

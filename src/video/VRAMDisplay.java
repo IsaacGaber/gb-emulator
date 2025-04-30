@@ -32,7 +32,7 @@ public class VRAMDisplay extends JPanel {
     public void updateTiles(byte[] VRAM) {
         _tiles.clear();
 
-        // iterate through ALL OF vram
+        // iterate through ALL OF tile ram
         for (int i = 0; i < VRAM.length / Tile.BYTE_LENGTH; i++) {
             byte[] tileBytes = new byte[Tile.BYTE_LENGTH];
             for (int j = 0; j < Tile.BYTE_LENGTH; j++) {

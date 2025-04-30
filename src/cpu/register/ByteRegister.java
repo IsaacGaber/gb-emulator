@@ -1,8 +1,17 @@
 package cpu.register;
 
+import java.util.Random;
+
+import util.Util;
+
 // Integer bounds checked, overflow simulated
 public class ByteRegister implements Register {
     protected int _b;
+
+    public ByteRegister() {
+        Random r = new Random();
+        _b = r.nextInt() & 0xFF;
+    }
 
     @Override
     public void set(int i) {
@@ -14,21 +23,15 @@ public class ByteRegister implements Register {
         return _b;
     }
     
-    // doesn't check bounds or set flags
+    // checks bounds, doesn't set flags
     @Override
     public void inc() {
-        _b++;
-        if (_b > 0xFF) {
-            _b = 0;
-        }
+        _b = Util.unsignedAdd(_b, 1);
     }
 
     @Override
     public void dec() {
-        _b--;
-        if (_b < 0) {
-            _b = 0;
-        }
-
+        _b = Util.unsignedSub(_b, 1);
     }
+
 }
