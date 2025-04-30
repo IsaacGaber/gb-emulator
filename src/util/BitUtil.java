@@ -21,11 +21,11 @@ public class BitUtil {
      * 
      * @param x operand one
      * @param y operand two
-     * @param bitPos bit to be compared e.g. bit 8 to check 8-bit arithmetic add carry
+     * @param bitPos bit to be compared e.g. bit 7 to check 8-bit arithmetic add carry
      * @return whether bit carried
      */
     public static boolean bitCarried(int x, int y, int bitPos) {
-        int mask = (1 << bitPos);
+        int mask = (1 << bitPos - 1);
         return (((x & (mask - 1)) + (y & (mask - 1))) & mask) == mask;
     }
 

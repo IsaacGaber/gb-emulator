@@ -3,10 +3,10 @@ package video;
 import java.awt.Color;
 
 public enum Colors {
-    A (Color.WHITE.getRGB()),
-    B (Color.GRAY.getRGB()),
-    C (Color.DARK_GRAY.getRGB()), 
-    D (0);
+    A (Color.BLACK.getRGB()),
+    B (Color.DARK_GRAY.getRGB()),
+    C (Color.GRAY.getRGB()), 
+    D (Color.WHITE.getRGB());
 
     public final int COLOR;
     Colors(int c){

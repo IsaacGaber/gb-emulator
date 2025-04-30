@@ -7,6 +7,7 @@ public enum Operand {
     N8,  // 8-bit integer constant (signed or unsigned, -128 to 255).
     N16, // 16-bit integer constant (signed or unsigned, -32768 to 65535).
     A16, // 16-bit address
+    A8, // 8-bit unsighed offset -- used to access HRAM
     E8,  // 8-bit signed offset (-128 to 127).
     U3, // 3-bit unsigned bit index (0 to 7, with 0 as the least significant bit).
     CC; // conditional codes

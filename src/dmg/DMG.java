@@ -7,11 +7,13 @@ import memory.Memory;
 import video.PPU;
 
 public class DMG {
-
+    // timings in hertz
+    private final int CPU_CLOCK = 4294304;
+    private final int OSCILLATOR_CLOCK = 1048576;
     public static void main(String[] args) throws Exception {
         String romPath;
         Scanner in = new Scanner(System.in);
-        // load file to disassemble 
+        // load file to run 
         // assumes file will be gameboy binary
         // while (true) {
         //     try {

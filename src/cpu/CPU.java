@@ -65,7 +65,7 @@ public class CPU {
 
         // init program counter
         PC.set(0x150);
-        SP.set(0); // TODO CHANGE TO ACTUAL START VALUE FOR STACK
+        SP.set(0); // start value set by boot ROM
 
         _instructionSet = new InstructionSet(this, _memory);
 
@@ -76,12 +76,14 @@ public class CPU {
         currentByte = nextByte();
         if (currentByte == 0xCB) {
             currentByte = nextByte();
+            System.out.println("Fetching Prefixed Instruction");
             currentInstruction = _instructionSet.getCBPrefixed(currentByte);
         } else {
             currentInstruction = _instructionSet.getUnprefixed(currentByte);
         }
-        // try {        
 
+        System.err.println(Util.byteToHexstring(currentByte));
+        System.out.println(this);
         _cycles += currentInstruction.run();
     }
     
@@ -113,6 +115,11 @@ public class CPU {
         _state = States.HALTED;
     }
 
+    // TODO implement
+    public void interrupt(){
+
+    }
+
     public boolean running() {
         return _state == States.RUNNING;
     }
@@ -121,9 +128,9 @@ public class CPU {
         StringBuilder sb = new StringBuilder();
         StringBuilder sbTwo = new StringBuilder();
         sb.append("Byte Value: " + Util.byteToHexstring(currentByte));
-        sb.append("Instruction: " + currentInstruction);
+        sb.append("\nInstruction: " + currentInstruction);
 
-        sb.append("Instruction Cycles: " + _cycles);
+        sb.append("\nInstruction Cycles: " + _cycles);
         sb.append("\nRegisters:\n");
 
         for (Entry<String, Register> entry : _registers.entrySet()) {

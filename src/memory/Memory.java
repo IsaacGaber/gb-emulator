@@ -17,7 +17,6 @@ public class Memory {
     private boolean inBios;
     
     public Memory(String romPath) {
-        // loadBIOS();
         _ram = new byte[ADDRESS_SPACE];
         _bios = new byte[256];
         _at = Area.NONE;
@@ -25,6 +24,7 @@ public class Memory {
         // set VBLANK to true for debugging purposes
         _ram[0xFF44] = (byte)0x90;
 
+        loadBIOS();
         loadROM(romPath);
         
         // should load a bunch of sprites right in the middle of Vram
@@ -41,7 +41,7 @@ public class Memory {
     public void loadBIOS() {
         // load boot rom into memory
         try {
-            File f = new File("assets\\test.gb");
+            File f = new File("assets\\dmg-boot.bin");
             FileInputStream input = new FileInputStream(f);
             for (int i = 0; i < _bios.length; i++) {
                 _bios[i] = (byte) input.read();
@@ -155,7 +155,7 @@ public class Memory {
     }
 
     public int getWord(int addr) {
-        return (getByte(addr) << 8 | getByte(addr+1));
+        return (getByte(addr) | getByte(addr+1) << 8);
     }
 
     public String lastArea() {
