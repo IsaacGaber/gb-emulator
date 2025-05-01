@@ -8,9 +8,12 @@ import util.Util;
 public class ByteRegister implements Register {
     protected int _b;
 
+    public ByteRegister(int i) {
+        _b = i;
+    }
+
     public ByteRegister() {
-        Random r = new Random();
-        _b = r.nextInt() & 0xFF;
+        this(0);
     }
 
     @Override

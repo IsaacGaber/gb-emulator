@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Random;
 
+import util.BitUtil;
 import util.Util;
 
 public class Memory {
@@ -20,9 +21,9 @@ public class Memory {
     public Memory(String romPath) {
         Random random = new Random();
         _ram = new byte[ADDRESS_SPACE];
-        // for (int i = 0; i < _ram.length; i++) {
-        //     _ram[i] = (byte) random.nextInt();
-        // }
+        for (int i = 0; i < _ram.length; i++) {
+            _ram[i] = (byte) random.nextInt();
+        }
         _bios = new byte[256];
         _at = Area.NONE;
 
@@ -44,7 +45,6 @@ public class Memory {
 
     }
 
-    // can run 
     public void loadBIOS() {
         // load boot rom into memory
         try {
@@ -86,6 +86,11 @@ public class Memory {
             return Byte.toUnsignedInt(_ram[addr]);
         }
     }
+
+    public int getWord(int addr) {
+        return (getByte(addr) | getByte(addr+1) << 8);
+    }
+
 
     public void setByte(int addr, int b) {
         _at = ramArea(addr);
@@ -161,9 +166,57 @@ public class Memory {
         return area;
     }
 
-    public int getWord(int addr) {
-        return (getByte(addr) | getByte(addr+1) << 8);
+    // access drawing related registers
+    public int getLCDC(){
+        return _ram[0xFF40];
     }
+
+    public void setLCDC(int i){
+        _ram[0xFF40] = (byte) i;
+    }
+
+    // set background and windows tile data, false = 8800–97FF; true = 8000–8FFF
+    public void setBGWTileData(boolean b){
+        int i = BitUtil.setBit(_ram[0xFF40], 4, b);
+        _ram[0xFF40] = (byte) i;
+    }
+    
+    // get background and windows tile data, false = 8800–97FF; true = 8000–8FFF
+    public boolean getBGWTileData(){
+        return BitUtil.getBit(_ram[0xFF40], 4);
+    }
+
+
+    public int getLY() {
+        return _ram[0xFF44];
+    }
+
+    public void setLY(int i) {
+        _ram[0xFF44] = (byte) i;
+    }
+
+    public int getLYC() {
+        return _ram[0xFF45];
+    }
+    // bg scroll Y
+    public int getSCY() {
+        return _ram[0xFF42];
+    }
+
+    public void setSCY(int i) {
+        _ram[0xFF42] = (byte) i;
+    }
+
+    // bg scroll Y
+    public int getSCX() {
+        return _ram[0xFF43];
+    }
+    
+    public void setSCX(int i) {
+        _ram[0xFF43] = (byte) i;
+    }
+    
+
 
     public String lastArea() {
         return _at.name();

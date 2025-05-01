@@ -1,15 +1,24 @@
 package dmg;
 
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import cpu.CPU;
 import memory.Memory;
-import video.PPU;
+import video.Video;
 
 public class DMG {
     // timings in hertz
-    private final int CPU_CLOCK = 4294304;
-    private final int OSCILLATOR_CLOCK = 1048576;
+    private static final int CPU_CLOCK = 4294304;
+    private static final int FRAMERATE = 60;
+    private static final double NANO_FRAMETIME = 1e9/FRAMERATE;
+    private static final int LINES = 153;
+    private static final int DOTS_LINE = 456;
+    private static final int OSCILLATOR_CLOCK = 1048576;
+    private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     public static void main(String[] args) throws Exception {
         String romPath;
         Scanner in = new Scanner(System.in);
@@ -25,9 +34,11 @@ public class DMG {
         //     }
         // }
         romPath = "assets\\hello-world.gb";
+
         Memory memory = new Memory(romPath);
-        // init vram display
-        PPU ppu = new PPU(memory);
+        // init vram display and display
+        Video video = new Video(memory);
+        
         // CPU must be initialized with reference to memory -- imagine conduits connecting elements
         CPU cpu = new CPU(memory);
 
@@ -56,17 +67,26 @@ public class DMG {
                 }
             }
         } else if(input.equals("r")) {
-            while (cpu.running()) {
-                cpu.step();
-                // System.out.println(cpu);
-            }
+            // ensure consistent clockspeed
+
+            final Runnable runner = new Runnable() {
+                public void run(){
+                    int cpuCycles = 0;
+                    while (cpuCycles < DOTS_LINE) {
+                        cpuCycles += cpu.step();
+                    }
+                    int LY = memory.getLY();
+                    LY = LY < 154 ? LY + 1 : 0;
+                    // update 
+                    memory.setLY(LY);
+                };
+            };    
+            scheduler.scheduleAtFixedRate(runner, 0, (long) (CPU_CLOCK / LINES), TimeUnit.NANOSECONDS);
         }
-
-
         in.close();
-        System.out.println("Exiting");
-        System.exit(0);
+        // System.out.println("Exiting");
+        // System.exit(0);
+
     }
     
-
 }

@@ -33,19 +33,23 @@ public class CPU {
     // cpu cycles
     private int _cycles; 
 
+    public int getCycles() {
+        return _cycles;
+    }
+
     public CPU(Memory memory) {
         _memory = memory;
         // init register array - used only for toString
         _registers = new TreeMap<>();
 
-        // init _registers
-        A = new ByteRegister(); _registers.put("A", A);
-        B = new ByteRegister(); _registers.put("B", B);
-        C = new ByteRegister(); _registers.put("C", C);
-        D = new ByteRegister(); _registers.put("D", D);
-        E = new ByteRegister(); _registers.put("E", E);
-        H = new ByteRegister(); _registers.put("H", H);
-        L = new ByteRegister(); _registers.put("L", L);
+        // init _registers -- values come from the cycle accurate game boy docs
+        A = new ByteRegister(0x01); _registers.put("A", A);
+        B = new ByteRegister(0x00); _registers.put("B", B);
+        C = new ByteRegister(0x13); _registers.put("C", C);
+        D = new ByteRegister(0x00); _registers.put("D", D);
+        E = new ByteRegister(0xd8); _registers.put("E", E);
+        H = new ByteRegister(0x01); _registers.put("H", H);
+        L = new ByteRegister(0x4d); _registers.put("L", L);
         // special flag register
         F = new FlagRegister(); _registers.put("F", F);
         // double _registers
@@ -72,9 +76,8 @@ public class CPU {
         _state = States.RUNNING;
     }
 
-    int furthestReached = 0;
-    Instruction furthestInstruction;
-    public void step() {
+    // returns cpu cycles taken
+    public int step() {
         // skip cartridge DRM check and audio -- jump straight to ROM entrypoint
         if (PC.get() == 0x008F) {
             PC.set(0x100);
@@ -111,7 +114,9 @@ public class CPU {
         // }
 
         // System.err.println(Util.byteToHexstring(currentByte));
-        _cycles += currentInstruction.run();
+        int cyclesTaken = currentInstruction.run();
+        _cycles += cyclesTaken;
+        return cyclesTaken;
     }
     
     public void setFlag(Flag f) {
