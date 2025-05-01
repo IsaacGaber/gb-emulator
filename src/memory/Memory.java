@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.util.Random;
 
 import util.BitUtil;
-import util.Util;
 
 public class Memory {
     private static final int ADDRESS_SPACE = 65536;
@@ -19,30 +18,21 @@ public class Memory {
     private boolean inBios;
     
     public Memory(String romPath) {
-        Random random = new Random();
         _ram = new byte[ADDRESS_SPACE];
-        for (int i = 0; i < _ram.length; i++) {
-            _ram[i] = (byte) random.nextInt();
-        }
+        // set RAM to random values on boot -- disabled as not entirely accurate -- RAM values only pseudo-random
+        // Random random = new Random();
+        // for (int i = 0; i < _ram.length; i++) {
+        //     _ram[i] = (byte) random.nextInt();
+        // }
         _bios = new byte[256];
         _at = Area.NONE;
 
-        // set VBLANK to true for debugging purposes
-        _ram[0xFF44] = (byte)0x90;
-        // 
-        _ram[0xFF42] = (byte)0x64;
+        // set VBLANK to true for debugging purposes -- recommended when stepping program manually as VBlank never set
+        // _ram[0xFF44] = (byte)0x90;
+
 
         loadBIOS();
         loadROM(romPath);
-        
-        // should load a bunch of sprites right in the middle of Vram
-        // byte[] testTile = new byte[]{0x3C, 0x7E, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 
-        //                             0x7E, 0x5E, 0x7E, 0x0A, 0x7C, 0x56, 0x38, 0x7C};
-        // for (int i = 0x8800; i < 0x9800; i++) {
-        //     _ram[i] = testTile[i % testTile.length];
-        // }
-
-
     }
 
     public void loadBIOS() {
@@ -82,7 +72,6 @@ public class Memory {
         if (inBios && addr < _bios.length) {
             return Byte.toUnsignedInt(_bios[addr]);
         } else {
-            // System.out.println("Getting value: " + Util.byteToHexstring(_ram[addr]) + " at address: " +  Util.wordToHexstring(addr));
             return Byte.toUnsignedInt(_ram[addr]);
         }
     }
@@ -94,7 +83,6 @@ public class Memory {
 
     public void setByte(int addr, int b) {
         _at = ramArea(addr);
-        // System.out.println("setting address: " + Util.wordToHexstring(addr) + " to value: " + Util.byteToHexstring(b));
         if (_at == Area.ROM0 || _at == Area.ROM1) {
             throw new RuntimeException("Cannot modify ROM");
         }
@@ -136,11 +124,6 @@ public class Memory {
                     // OAM is 160 bytes, remaining bytes read as 0
                     case 0xE00:
                         yield Area.OAM;
-                        // if (addr < 0xFEA0) {
-                        //     return _ram[addr];
-                        // } else {
-                        //     return 0;
-                        // }
                     // High-Speed Zero-page
                     case 0xF00:
                         //HRAM
@@ -207,7 +190,7 @@ public class Memory {
         _ram[0xFF42] = (byte) i;
     }
 
-    // bg scroll Y
+    // bg scroll X
     public int getSCX() {
         return _ram[0xFF43];
     }
@@ -216,8 +199,6 @@ public class Memory {
         _ram[0xFF43] = (byte) i;
     }
     
-
-
     public String lastArea() {
         return _at.name();
     }

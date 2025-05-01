@@ -1,16 +1,13 @@
 package util;
 
 public class BitUtil {
-
-    public static final int MASK_8  = 0x000000FF;
-    public static final int MASK_16 = 0x0000FFFF;
     
     public static boolean is8Bit(int i) {
-        return (i & MASK_8) == 0;
+        return (i & 0xFF) == 0;
     }
 
     public static boolean is16Bit(int i) {
-        return (i & MASK_16) == 0;
+        return (i & 0xFFFF) == 0;
     }
 
     public static boolean getBit(int value, int position) {
@@ -30,19 +27,7 @@ public class BitUtil {
     }
 
 
-    // /** 
-    //  * 
-    //  * @param x operand one
-    //  * @param y operand two
-    //  * @param bitPos bit to be compared e.g. bit 0 to check 8-bit arithmetic sub carry
-    //  * @return whether bit carried
-    //  */
-    // public static boolean bitCarriedSub(int x, int y, int bitPos) {
-    //     int mask = (1 << (bitPos + 1));
-    //     return (((x << 1) - (y << 1)) & mask) == mask;
-    // }
-
-    /** sets bit value to true or false and returns result
+    /** sets bit value to true or false and returns result.
      * 
      * @param value
      * @param position
@@ -57,6 +42,12 @@ public class BitUtil {
         }
     }
 
+    /**
+     * returns value with bit at bitPosition flipped.
+     * @param value
+     * @param bitPosition
+     * @return
+     */
     public static int flipBit(int value, int bitPosition) {
         if (getBit(value, bitPosition)) {
             return ~(1 << bitPosition) & value;

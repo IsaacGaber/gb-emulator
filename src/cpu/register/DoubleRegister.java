@@ -1,7 +1,5 @@
 package cpu.register;
 
-import util.BitUtil;
-
 /** wrapper around two byte regisers
  * 
  */

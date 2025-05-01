@@ -1,7 +1,5 @@
 package cpu.register;
 
-import java.util.Random;
-
 import util.Util;
 
 // Integer bounds checked, overflow simulated
