@@ -1,7 +1,7 @@
 package video;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
+// import java.awt.BasicStroke;
+// import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,7 +13,7 @@ import memory.Memory;
 
 
 // renders background to buffered image panel
-public class BackgroundDisplay extends JPanel {
+public class Display extends JPanel {
     
     private static int TILEMAP_START = 0x9800;
 
@@ -30,14 +30,14 @@ public class BackgroundDisplay extends JPanel {
     public static final int SCREEN_SCALE = 3;
     public static final Dimension SCREEN_SIZE = new Dimension(160, 144);
 
-    public BackgroundDisplay(Memory memory) {
+    public Display(Memory memory) {
         _memory = memory;
         _framebuffer = new BufferedImage(BG_SIZE, BG_SIZE, BufferedImage.TYPE_3BYTE_BGR);
         _tiles = new Tile[TILEMAP_SIZE * TILEMAP_SIZE];
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(BG_SIZE * SCREEN_SCALE, BG_SIZE * SCREEN_SCALE);
+        return new Dimension(SCREEN_SIZE.width * SCREEN_SCALE, SCREEN_SIZE.height * SCREEN_SCALE);
     }
 
     private void updateTiles() {
@@ -84,10 +84,12 @@ public class BackgroundDisplay extends JPanel {
         updateTiles();
         drawTiles(_framebuffer);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.drawImage(_framebuffer.getScaledInstance(getWidth(), getHeight(), 0), 1, 1, null);
-        g2d.setColor(Color.RED);    
-        g2d.setStroke(new BasicStroke(5));
-        g2d.drawRect(0, _memory.getSCY() * SCREEN_SCALE, SCREEN_SIZE.width * SCREEN_SCALE, SCREEN_SIZE.height * SCREEN_SCALE);
+        g2d.drawImage(_framebuffer.getScaledInstance(BG_SIZE * SCREEN_SCALE, BG_SIZE * SCREEN_SCALE, 0), 0, 0 - _memory.getSCY() * SCREEN_SCALE, null);
+        // g2d.drawImage(_framebuffer.getScaledInstance(BG_SIZE * SCREEN_SCALE, BG_SIZE * SCREEN_SCALE, 0), 0, BG_SIZE  * SCREEN_SCALE - _memory.getSCY() * SCREEN_SCALE, null);
+
+        // g2d.setColor(Color.RED);    
+        // g2d.setStroke(new BasicStroke(5));
+        // g2d.drawRect(0, _memory.getSCY() * SCREEN_SCALE, SCREEN_SIZE.width * SCREEN_SCALE, SCREEN_SIZE.height * SCREEN_SCALE);
 
     }  
 

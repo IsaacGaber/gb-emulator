@@ -28,10 +28,10 @@ public class Video {
 
 
     private void showDisplay(Memory memory) {
-        JFrame f = new JFrame("GAME BOY background view");
-        BackgroundDisplay d = new BackgroundDisplay(memory);
-        int delay = 10; // milliseconds roughly to 60 FPS
-        
+        JFrame f = new JFrame("gb-emulator");
+        Display d = new Display(memory);
+        int delay = 16; // milliseconds roughly to 60 FPS
+    
         ActionListener actionListener = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 d.repaint();

@@ -23,8 +23,8 @@ public class Tile {
             byte a = bytes[y * 2];
             byte b = bytes[y * 2 + 1];
             for (int x = 0; x < tileWidth; x++) {  
-                boolean aSet = BitUtil.getBit(a, tileWidth-x);
-                boolean bSet = BitUtil.getBit(b, tileWidth-x);
+                boolean aSet = BitUtil.getBit(a, tileWidth-x-1);
+                boolean bSet = BitUtil.getBit(b, tileWidth-x-1);
                 
                 int i = (y * tileWidth) + x;
                 if (aSet && bSet) {

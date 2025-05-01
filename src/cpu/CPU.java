@@ -78,8 +78,8 @@ public class CPU {
 
     // returns cpu cycles taken
     public int step() {
-        // skip cartridge DRM check and audio -- jump straight to ROM entrypoint
-        if (PC.get() == 0x008F) {
+        // skip cartridge DRM check and audio plus artificial delay jump straight to ROM entrypoint
+        if (PC.get() == 0x008F && _cycles > 0x4FFFFFF) {
             PC.set(0x100);
         }
         // SKIP ZEROING OUT VRAM LOOP
